@@ -28,7 +28,13 @@ export const getRecipeSummary = async (recipeId: string) => {
 
 export const getFavouriteRecipes = async () => {
     const url = new URL("http://localhost:5000/api/recipes/favourite");
-    const response = await fetch(url);
+    const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
 
     if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -37,10 +43,11 @@ export const getFavouriteRecipes = async () => {
     return response.json();
 };
 
-export const addFavouriteRecipe = async (recipe: Recipe) => {
+export const addFavouriteRecipe = async (recipe: Recipe, userId: number) => {
     const url = new URL("http://localhost:5000/api/recipes/favourite");
     const body = {
         recipeId: recipe.id,
+        userId: userId,
     };
 
     const response = await fetch(url, {
@@ -49,6 +56,7 @@ export const addFavouriteRecipe = async (recipe: Recipe) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
+        credentials: "include",
     });
 
     if (!response.ok) {
@@ -56,10 +64,11 @@ export const addFavouriteRecipe = async (recipe: Recipe) => {
     }
 };
 
-export const removeFavouriteRecipe = async (recipe: Recipe) => {
+export const removeFavouriteRecipe = async (recipe: Recipe, userId: number) => {
     const url = new URL("http://localhost:5000/api/recipes/favourite");
     const body = {
         recipeId: recipe.id,
+        userId: userId,
     };
 
     const response = await fetch(url, {
@@ -68,6 +77,7 @@ export const removeFavouriteRecipe = async (recipe: Recipe) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
+        credentials: "include",
     });
 
     if (!response.ok) {
