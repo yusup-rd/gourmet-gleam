@@ -46,6 +46,40 @@ export const getRecipeSummary = async (recipeId: string) => {
     return json;
 };
 
+export const getRecipeInstructions = async (recipeId: string) => {
+    if (!apiKey) {
+        throw new Error("API Key not found");
+    }
+
+    const url = new URL(`https://api.spoonacular.com/recipes/${recipeId}/analyzedInstructions`);
+    const params = {
+        apiKey: apiKey,
+    };
+    url.search = new URLSearchParams(params).toString();
+
+    const response = await fetch(url);
+    const json = await response.json();
+
+    return json;
+};
+
+export const getRecipeIngredients = async (recipeId: string) => {
+    if (!apiKey) {
+        throw new Error("API Key not found");
+    }
+
+    const url = new URL(`https://api.spoonacular.com/recipes/${recipeId}/ingredientWidget.json`);
+    const params = {
+        apiKey: apiKey,
+    };
+    url.search = new URLSearchParams(params).toString();
+
+    const response = await fetch(url);
+    const json = await response.json();
+
+    return json;
+};
+
 export const getFavouriteRecipesByIDs = async (ids: string[]) => {
     if (!apiKey) {
         throw new Error("API Key not found");

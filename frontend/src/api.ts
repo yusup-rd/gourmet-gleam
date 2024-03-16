@@ -26,6 +26,32 @@ export const getRecipeSummary = async (recipeId: string) => {
     return response.json();
 };
 
+export const getRecipeInstructions = async (recipeId: string) => {
+    const url = new URL(
+        `http://localhost:5000/api/recipes/${recipeId}/instructions`
+    );
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return response.json();
+};
+
+export const getRecipeIngredients = async (recipeId: string) => {
+    const url = new URL(
+        `http://localhost:5000/api/recipes/${recipeId}/ingredients`
+    );
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return response.json();
+};
+
 export const getFavouriteRecipes = async () => {
     const url = new URL("http://localhost:5000/api/recipes/favourite");
     const response = await fetch(url, {

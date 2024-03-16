@@ -48,6 +48,68 @@ app.get("/", verifyUser, (req, res) => {
     });
 });
 
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await prismaClient.user.findUnique({
+            where: { email: email },
+        });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ error: "Invalid password" });
+        }
+        const tokenPayload = {
+            email: user.email,
+            role: user.role,
+            userId: user.id,
+        };
+        const token = jwt.sign(tokenPayload, jwtSecret, {
+            expiresIn: "1d",
+        });
+        res.cookie("token", token);
+        return res.json({ message: "Login successful", role: user.role });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.post("/register", async (req, res) => {
+    const { name, email, password } = req.body;
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await prismaClient.user.create({
+            data: {
+                name: name,
+                email: email,
+                password: hashedPassword,
+            },
+        });
+        return res.json({ message: "User registered successfully" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.get("/logout", (req, res) => {
+    res.clearCookie("token");
+    return res.json({ message: "Logout successful" });
+});
+
+app.get("/user-role", verifyUser, (req, res) => {
+    const userRole = req.body.role;
+    res.json({ role: userRole });
+});
+
+app.get("/user-id", verifyUser, (req, res) => {
+    const userId = req.body.id;
+    res.json({ userId: userId });
+});
+
 app.get("/api/recipes/search", async (req, res) => {
     const searchTerm = req.query.searchTerm as string;
     const page = parseInt(req.query.page as string);
@@ -118,66 +180,24 @@ app.delete("/api/recipes/favourite", verifyUser, async (req, res) => {
     }
 });
 
-app.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+app.get('/api/recipes/:recipeId/instructions', async (req, res) => {
+    const recipeId = req.params.recipeId;
     try {
-        const user = await prismaClient.user.findUnique({
-            where: { email: email },
-        });
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
-            return res.status(401).json({ error: "Invalid password" });
-        }
-        const tokenPayload = {
-            email: user.email,
-            role: user.role,
-            userId: user.id,
-        };
-        const token = jwt.sign(tokenPayload, jwtSecret, {
-            expiresIn: "1d",
-        });
-        res.cookie("token", token);
-        return res.json({ message: "Login successful", role: user.role });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "Internal server error" });
+        const instructions = await RecipeAPI.getRecipeInstructions(recipeId);
+        res.json(instructions);
+    } catch (error:any) {
+        res.status(500).json({ error: error.message });
     }
 });
 
-app.post("/register", async (req, res) => {
-    const { name, email, password } = req.body;
+app.get('/api/recipes/:recipeId/ingredients', async (req, res) => {
+    const recipeId = req.params.recipeId;
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await prismaClient.user.create({
-            data: {
-                name: name,
-                email: email,
-                password: hashedPassword,
-            },
-        });
-        return res.json({ message: "User registered successfully" });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "Internal server error" });
+        const ingredients = await RecipeAPI.getRecipeIngredients(recipeId);
+        res.json(ingredients);
+    } catch (error:any) {
+        res.status(500).json({ error: error.message });
     }
-});
-
-app.get("/logout", (req, res) => {
-    res.clearCookie("token");
-    return res.json({ message: "Logout successful" });
-});
-
-app.get("/user-role", verifyUser, (req, res) => {
-    const userRole = req.body.role;
-    res.json({ role: userRole });
-});
-
-app.get("/user-id", verifyUser, (req, res) => {
-    const userId = req.body.id;
-    res.json({ userId: userId });
 });
 
 app.listen(5000, () => {
