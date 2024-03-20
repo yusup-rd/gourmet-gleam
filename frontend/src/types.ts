@@ -3,6 +3,9 @@ export interface Recipe {
     title: string;
     image: string;
     imageType: string;
+    missedIngredients?: Ingredient[];
+    unusedIngredients?: Ingredient[];
+    usedIngredients?: Ingredient[];
 }
 
 export interface RecipeSummary {
