@@ -27,6 +27,37 @@ export const searchRecipes = async (searchTerm: string, page: number) => {
     }
 };
 
+export const searchRecipesByIngredients = async (ingredients: string[], page: number) => {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+        throw new Error("API Key not found");
+    }
+
+    const recipesPerPage = 10; // Number of recipes per page
+
+    const url = new URL("https://api.spoonacular.com/recipes/findByIngredients");
+    const queryParams = {
+        apiKey,
+        ingredients: ingredients.join(",+"),
+        number: (page * recipesPerPage).toString(), // Increment number parameter for next 10 recipes
+    };
+    url.search = new URLSearchParams(queryParams).toString();
+
+    try {
+        const searchResponse = await fetch(url);
+        if (!searchResponse.ok) {
+            throw new Error(`Failed to fetch recipes. Status: ${searchResponse.status}`);
+        }
+        const resultsJson = await searchResponse.json();
+        return resultsJson;
+    } catch (error) {
+        console.error("Error searching recipes by ingredients:", error);
+        throw error;
+    }
+};
+
+
+
 export const getRecipeSummary = async (recipeId: string) => {
     if (!apiKey) {
         throw new Error("API Key not found");

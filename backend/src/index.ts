@@ -117,6 +117,20 @@ app.get("/api/recipes/search", async (req, res) => {
 
     return res.json(results);
 });
+app.get("/api/recipes/findByIngredients", async (req, res) => {
+    const ingredients = Array.isArray(req.query.ingredients)
+        ? (req.query.ingredients as string[])
+        : [req.query.ingredients as string];
+    const page = parseInt(req.query.page as string); // Parse page parameter
+
+    try {
+        const results = await RecipeAPI.searchRecipesByIngredients(ingredients, page); // Pass page parameter
+        res.json(results);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch recipes" });
+    }
+});
+
 
 app.get("/api/recipes/:recipeId/summary", async (req, res) => {
     const recipeId = req.params.recipeId;

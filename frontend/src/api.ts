@@ -10,8 +10,32 @@ export const searchRecipes = async (searchTerm: string, page: number) => {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    return data;
 };
+
+export const searchRecipesByIngredients = async (ingredients: string[], page: number) => {
+    const baseUrl = new URL("http://localhost:5000/api/recipes/findByIngredients");
+    baseUrl.searchParams.append("ingredients", ingredients.join(",+"));
+    baseUrl.searchParams.append("page", String(page)); // Add page parameter
+
+    try {
+        const response = await fetch(baseUrl.toString());
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error searching recipes by ingredients:", error);
+        throw error;
+    }
+};
+
+
+
+
+
 
 export const getRecipeSummary = async (recipeId: string) => {
     const url = new URL(
