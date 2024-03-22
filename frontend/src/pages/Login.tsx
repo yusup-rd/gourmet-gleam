@@ -7,18 +7,15 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    
+
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         axios.defaults.withCredentials = true;
         e.preventDefault();
         try {
-            const response = await axios.post(
-                "http://localhost:5000/login",
-                {
-                    email,
-                    password,
-                }
-            );
+            const response = await axios.post("http://localhost:5000/login", {
+                email,
+                password,
+            });
             console.log(response.data);
             navigate("/");
         } catch (error) {

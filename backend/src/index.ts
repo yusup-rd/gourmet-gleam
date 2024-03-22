@@ -31,12 +31,19 @@ const verifyUser = (req: Request, res: Response, next: NextFunction) => {
                 return res.json({ Error: "Token has an issue or expired" });
             } else {
                 req.body.email = decoded.email;
-                req.body.role = decoded.role;
+                req.body.role = decoded.role; // Include role in request body
                 req.body.userId = decoded.userId;
                 next();
             }
         });
     }
+};
+
+const restrictToAdmin = (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.role !== "admin") {
+        return res.status(403).json({ Error: "Access forbidden" });
+    }
+    next();
 };
 
 app.get("/", verifyUser, (req, res) => {
@@ -124,13 +131,15 @@ app.get("/api/recipes/findByIngredients", async (req, res) => {
     const page = parseInt(req.query.page as string); // Parse page parameter
 
     try {
-        const results = await RecipeAPI.searchRecipesByIngredients(ingredients, page); // Pass page parameter
+        const results = await RecipeAPI.searchRecipesByIngredients(
+            ingredients,
+            page
+        ); // Pass page parameter
         res.json(results);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch recipes" });
     }
 });
-
 
 app.get("/api/recipes/:recipeId/summary", async (req, res) => {
     const recipeId = req.params.recipeId;
@@ -194,22 +203,22 @@ app.delete("/api/recipes/favourite", verifyUser, async (req, res) => {
     }
 });
 
-app.get('/api/recipes/:recipeId/instructions', async (req, res) => {
+app.get("/api/recipes/:recipeId/instructions", async (req, res) => {
     const recipeId = req.params.recipeId;
     try {
         const instructions = await RecipeAPI.getRecipeInstructions(recipeId);
         res.json(instructions);
-    } catch (error:any) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-app.get('/api/recipes/:recipeId/ingredients', async (req, res) => {
+app.get("/api/recipes/:recipeId/ingredients", async (req, res) => {
     const recipeId = req.params.recipeId;
     try {
         const ingredients = await RecipeAPI.getRecipeIngredients(recipeId);
         res.json(ingredients);
-    } catch (error:any) {
+    } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });

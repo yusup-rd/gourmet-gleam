@@ -13,7 +13,7 @@ const Home = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [searchIngredient, setSearchIngredient] = useState<string>("");
     const [searchIngredients, setSearchIngredients] = useState<string[]>([]);
-    const [searchType, setSearchType] = useState<string>("name"); // Default to search by name
+    const [searchType, setSearchType] = useState<string>("name");
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(
         undefined
@@ -22,7 +22,7 @@ const Home = () => {
     const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
     const [recipesDisplayed, setRecipesDisplayed] = useState<boolean>(false);
     const pageNumber = useRef(1);
-    const [searchClicked, setSearchClicked] = useState<boolean>(false); // Track if search button has been clicked
+    const [searchClicked, setSearchClicked] = useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
