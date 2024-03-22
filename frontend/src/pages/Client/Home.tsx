@@ -1,11 +1,11 @@
-import "../App.css";
+import "../../App.css";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import * as api from "../api";
-import { Recipe } from "../types";
-import RecipeCard from "../components/RecipeCard";
-import RecipeModal from "../components/RecipeModal";
+import * as api from "../../api";
+import { Recipe } from "../../types";
+import RecipeCard from "../../components/RecipeCard";
+import RecipeModal from "../../components/RecipeModal";
 import { useNavigate } from "react-router-dom";
-import { logout, isAuthenticated, getUserId, getUserRole } from "../authApi";
+import { logout, isAuthenticated, getUserId, getUserRole } from "../Auth/authApi";
 
 type Tabs = "search" | "favourites";
 
@@ -181,7 +181,6 @@ const Home = () => {
     };
 
     const handleSearchTypeChange = (newSearchType: string) => {
-        // Clear displayed recipes when search type changes
         if (recipesDisplayed) {
             clearDisplayedRecipes();
         }

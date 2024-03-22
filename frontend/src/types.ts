@@ -56,3 +56,10 @@ export interface Length {
     number: number;
     unit: string;
 }
+
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+    password: string;
+}

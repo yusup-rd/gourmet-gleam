@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(
     cors({
         origin: ["http://localhost:5173"],
-        methods: ["POST", "GET", "DELETE"],
+        methods: ["POST", "GET", "DELETE", "PUT"],
         credentials: true,
     })
 );
@@ -31,19 +31,12 @@ const verifyUser = (req: Request, res: Response, next: NextFunction) => {
                 return res.json({ Error: "Token has an issue or expired" });
             } else {
                 req.body.email = decoded.email;
-                req.body.role = decoded.role; // Include role in request body
+                req.body.role = decoded.role;
                 req.body.userId = decoded.userId;
                 next();
             }
         });
     }
-};
-
-const restrictToAdmin = (req: Request, res: Response, next: NextFunction) => {
-    if (req.body.role !== "admin") {
-        return res.status(403).json({ Error: "Access forbidden" });
-    }
-    next();
 };
 
 app.get("/", verifyUser, (req, res) => {
@@ -55,6 +48,7 @@ app.get("/", verifyUser, (req, res) => {
     });
 });
 
+// Authorization
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -117,6 +111,7 @@ app.get("/user-id", verifyUser, (req, res) => {
     res.json({ userId: userId });
 });
 
+// Home page functionality
 app.get("/api/recipes/search", async (req, res) => {
     const searchTerm = req.query.searchTerm as string;
     const page = parseInt(req.query.page as string);
@@ -128,13 +123,13 @@ app.get("/api/recipes/findByIngredients", async (req, res) => {
     const ingredients = Array.isArray(req.query.ingredients)
         ? (req.query.ingredients as string[])
         : [req.query.ingredients as string];
-    const page = parseInt(req.query.page as string); // Parse page parameter
+    const page = parseInt(req.query.page as string);
 
     try {
         const results = await RecipeAPI.searchRecipesByIngredients(
             ingredients,
             page
-        ); // Pass page parameter
+        );
         res.json(results);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch recipes" });
@@ -220,6 +215,58 @@ app.get("/api/recipes/:recipeId/ingredients", async (req, res) => {
         res.json(ingredients);
     } catch (error: any) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin page functionality
+app.get("/admin/users", verifyUser, async (req, res) => {
+    const search = req.query.search as string;
+    try {
+        let users: any;
+        if (search) {
+            const searchTerm = `%${search}%`;
+            users = await prismaClient.user.findMany({
+                where: {
+                    role: "client",
+                    OR: [
+                        { name: { contains: searchTerm, mode: "insensitive" } },
+                        {
+                            email: {
+                                contains: searchTerm,
+                                mode: "insensitive",
+                            },
+                        },
+                    ],
+                },
+            });
+        } else {
+            users = await prismaClient.user.findMany({
+                where: {
+                    role: "client",
+                },
+            });
+        }
+        return res.json(users);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Something went wrong" });
+    }
+});
+
+app.put("/admin/users/:userId", async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    const { name, email } = req.body;
+
+    try {
+        const updatedUser = await prismaClient.user.update({
+            where: { id: userId },
+            data: { name, email },
+        });
+
+        return res.json(updatedUser);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to update user data" });
     }
 });
 
