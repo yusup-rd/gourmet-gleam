@@ -270,6 +270,20 @@ app.put("/admin/users/:userId", async (req, res) => {
     }
 });
 
+app.delete("/admin/users/:userId", async (req, res) => {
+    const userId = parseInt(req.params.userId);
+    try {
+        await prismaClient.user.delete({
+            where: { id: userId }
+        });
+
+        return res.json({ message: "User deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to delete user" });
+    }
+});
+
 app.listen(5000, () => {
     console.log("Running...");
 });
