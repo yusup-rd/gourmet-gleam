@@ -1,5 +1,5 @@
 #root{
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Poppins", Arial, Helvetica, sans-serif;
 }
 
 .overlay{
@@ -47,4 +47,24 @@
     display: flex;
     align-items: center;
     gap: 0.5em;
+}
+
+.navbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    background-color: greenyellow;
+}
+
+.avatar-container{
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.dropdown-content{
+    background-color: gray;
+}
+.dropdown-btn{
+    padding: 20px;
 }

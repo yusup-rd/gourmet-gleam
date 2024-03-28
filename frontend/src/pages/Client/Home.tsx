@@ -4,8 +4,9 @@ import * as api from "../../api";
 import { Recipe } from "../../types";
 import RecipeCard from "../../components/RecipeCard";
 import RecipeModal from "../../components/RecipeModal";
+import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { logout, isAuthenticated, getUserId, getUserRole } from "../Auth/authApi";
+import { isAuthenticated, getUserId, getUserRole } from "../Auth/authApi";
 
 type Tabs = "search" | "favourites";
 
@@ -46,18 +47,8 @@ const Home = () => {
                 console.error("Error fetching data:", error);
             }
         };
-
         fetchData();
     }, [searchClicked, navigate]);
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate("/login");
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     const handleSearchSubmit = async (event: FormEvent) => {
         event.preventDefault();
@@ -189,7 +180,7 @@ const Home = () => {
 
     return (
         <div>
-            <button onClick={handleLogout}>Logout</button>
+            <Navbar /> {/* Render Navbar component */}
             <div className="tabs">
                 <h1 onClick={() => setSelectedTab("search")}>Recipe Search</h1>
                 <h1 onClick={() => setSelectedTab("favourites")}>Favourites</h1>
