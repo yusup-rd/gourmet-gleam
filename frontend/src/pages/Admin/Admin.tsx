@@ -13,7 +13,7 @@ const Admin = () => {
     const [editableUserId, setEditableUserId] = useState<number | null>(null);
     const [editedName, setEditedName] = useState<string>("");
     const [editedEmail, setEditedEmail] = useState<string>("");
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Initialize to "asc"
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     const [sortBy, setSortBy] = useState<"id" | "name" | "email">("id");
 
     useEffect(() => {

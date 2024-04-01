@@ -274,13 +274,51 @@ app.delete("/admin/users/:userId", async (req, res) => {
     const userId = parseInt(req.params.userId);
     try {
         await prismaClient.user.delete({
-            where: { id: userId }
+            where: { id: userId },
         });
 
         return res.json({ message: "User deleted successfully" });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Failed to delete user" });
+    }
+});
+
+// User Profile Page Functionality
+app.get("/profile", verifyUser, async (req, res) => {
+    const userId = req.body.userId;
+
+    try {
+        const user = await prismaClient.user.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, email: true },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.json(user);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to fetch user data" });
+    }
+});
+
+app.put("/profile", async (req, res) => {
+    const userId = req.body.userId;
+    const { name, email } = req.body;
+
+    try {
+        const updatedUser = await prismaClient.user.update({
+            where: { id: userId },
+            data: { name, email },
+        });
+
+        return res.json(updatedUser);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to update user data" });
     }
 });
 
