@@ -322,6 +322,42 @@ app.put("/profile", async (req, res) => {
     }
 });
 
+app.post("/profile/change-password", verifyUser, async (req, res) => {
+    const userId = req.body.userId;
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+        const user = await prismaClient.user.findUnique({
+            where: { id: userId },
+            select: { id: true, password: true },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const isValidPassword = await bcrypt.compare(
+            currentPassword,
+            user.password
+        );
+        if (!isValidPassword) {
+            return res.status(401).json({ error: "Invalid current password" });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        await prismaClient.user.update({
+            where: { id: userId },
+            data: { password: hashedNewPassword },
+        });
+
+        return res.json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to update password" });
+    }
+});
+
 app.listen(5000, () => {
     console.log("Running...");
 });
