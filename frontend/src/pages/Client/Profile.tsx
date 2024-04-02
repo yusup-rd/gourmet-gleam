@@ -21,6 +21,7 @@ const Profile = () => {
     const [editedEmail, setEditedEmail] = useState("");
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [nameError, setNameError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
@@ -142,11 +143,16 @@ const Profile = () => {
     const handleSavePassword = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            if (!currentPassword || !newPassword) {
+            if (!currentPassword || !newPassword || !confirmNewPassword) {
+                throw new Error("All password fields are required");
+            }
+
+            if (newPassword !== confirmNewPassword) {
                 throw new Error(
-                    "Both current password and new password are required"
+                    "New password and confirm new password do not match"
                 );
             }
+
             const response = await fetch(
                 "http://localhost:5000/profile/change-password",
                 {
@@ -172,6 +178,8 @@ const Profile = () => {
             } else {
                 setEditablePassword(false);
                 setPasswordError("");
+                setNewPassword("");
+                setConfirmNewPassword("");
             }
         } catch (error: any) {
             if (error.message !== "Invalid current password") {
@@ -193,6 +201,12 @@ const Profile = () => {
 
     const handleChangeNewPassword = (event: ChangeEvent<HTMLInputElement>) => {
         setNewPassword(event.target.value);
+    };
+
+    const handleChangeConfirmNewPassword = (
+        event: ChangeEvent<HTMLInputElement>
+    ) => {
+        setConfirmNewPassword(event.target.value);
     };
 
     return (
@@ -275,6 +289,13 @@ const Profile = () => {
                                     placeholder="New Password"
                                     value={newPassword}
                                     onChange={handleChangeNewPassword}
+                                    autoComplete="true"
+                                />
+                                <input
+                                    type="password"
+                                    placeholder="Confirm New Password"
+                                    value={confirmNewPassword}
+                                    onChange={handleChangeConfirmNewPassword}
                                     autoComplete="true"
                                 />
                                 <button type="submit">Save Password</button>
