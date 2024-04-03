@@ -1,17 +1,26 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import Navbar from "../../components/Navbar";
+import Select from "react-select";
 
 const Profile = () => {
     interface UserData {
         id: number;
         name: string;
         email: string;
+        preferredCuisine: string[];
+        excludedCuisine: string[];
+        diet: string[];
+        intolerances: string[];
     }
 
     const [userData, setUserData] = useState<UserData>({
         id: 0,
         name: "",
         email: "",
+        preferredCuisine: [],
+        excludedCuisine: [],
+        diet: [],
+        intolerances: [],
     });
     const [isLoading, setIsLoading] = useState(true);
     const [editableName, setEditableName] = useState(false);
@@ -61,6 +70,10 @@ const Profile = () => {
         name?: string;
         email?: string;
         password?: string;
+        preferredCuisine?: string[];
+        excludedCuisine?: string[];
+        diet?: string[];
+        intolerances?: string[];
     }) => {
         try {
             const response = await fetch("http://localhost:5000/profile", {
@@ -75,7 +88,10 @@ const Profile = () => {
                 throw new Error("Failed to update user data");
             }
             const updatedData = await response.json();
-            setUserData(updatedData);
+            setUserData((prevUserData) => ({
+                ...prevUserData,
+                ...updatedData,
+            }));
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -209,6 +225,96 @@ const Profile = () => {
         setConfirmNewPassword(event.target.value);
     };
 
+    // Options for preferences settings
+    const cuisineOptions = [
+        { value: "african", label: "African" },
+        { value: "asian", label: "Asian" },
+        { value: "american", label: "American" },
+        { value: "british", label: "British" },
+        { value: "cajun", label: "Cajun" },
+        { value: "caribbean", label: "Caribbean" },
+        { value: "chinese", label: "Chinese" },
+        { value: "eastern european", label: "Eastern European" },
+        { value: "european", label: "European" },
+        { value: "french", label: "French" },
+        { value: "german", label: "German" },
+        { value: "greek", label: "Greek" },
+        { value: "indian", label: "Indian" },
+        { value: "irish", label: "Irish" },
+        { value: "italian", label: "Italian" },
+        { value: "japanese", label: "Japanese" },
+        { value: "jewish", label: "Jewish" },
+        { value: "korean", label: "Korean" },
+        { value: "latin american", label: "Latin American" },
+        { value: "mediterranean", label: "Mediterranean" },
+        { value: "mexican", label: "Mexican" },
+        { value: "middle eastern", label: "Middle Eastern" },
+        { value: "nordic", label: "Nordic" },
+        { value: "southern", label: "Southern" },
+        { value: "spanish", label: "Spanish" },
+        { value: "thai", label: "Thai" },
+        { value: "vietnamese", label: "Vietnamese" },
+    ];
+
+    const dietOptions = [
+        { value: "gluten free", label: "Gluten Free" },
+        { value: "ketogenic", label: "Ketogenic" },
+        { value: "vegetarian", label: "Vegetarian" },
+        { value: "lacto-vegetarian", label: "Lacto-Vegetarian" },
+        { value: "ovo-vegetarian", label: "Ovo-Vegetarian" },
+        { value: "vegan", label: "Vegan" },
+        { value: "pescetarian", label: "Pescetarian" },
+        { value: "paleo", label: "Paleo" },
+        { value: "primal", label: "Primal" },
+        { value: "low fodmap", label: "Low FODMAP" },
+        { value: "whole30", label: "Whole30" },
+    ];
+
+    const intolerancesOptions = [
+        { value: "dairy", label: "Dairy" },
+        { value: "egg", label: "Egg" },
+        { value: "gluten", label: "Gluten" },
+        { value: "grain", label: "Grain" },
+        { value: "peanut", label: "Peanut" },
+        { value: "seafood", label: "Seafood" },
+        { value: "sesame", label: "Sesame" },
+        { value: "shellfish", label: "Shellfish" },
+        { value: "soy", label: "Soy" },
+        { value: "sulfite", label: "Sulfite" },
+        { value: "tree nut", label: "Tree Nut" },
+        { value: "wheat", label: "Wheat" },
+    ];
+
+    const handlePreferredCuisineChange = (selectedOptions: any) => {
+        updateUserData({
+            userId: userData.id,
+            preferredCuisine: selectedOptions.map(
+                (option: any) => option.value
+            ),
+        });
+    };
+
+    const handleExcludedCuisineChange = (selectedOptions: any) => {
+        updateUserData({
+            userId: userData.id,
+            excludedCuisine: selectedOptions.map((option: any) => option.value),
+        });
+    };
+
+    const handleDietChange = (selectedOptions: any) => {
+        updateUserData({
+            userId: userData.id,
+            diet: selectedOptions.map((option: any) => option.value),
+        });
+    };
+
+    const handleIntolerancesChange = (selectedOptions: any) => {
+        updateUserData({
+            userId: userData.id,
+            intolerances: selectedOptions.map((option: any) => option.value),
+        });
+    };
+
     return (
         <>
             <Navbar />
@@ -220,6 +326,7 @@ const Profile = () => {
                 <>
                     <h3>Welcome, {userData.name}</h3>
 
+                    <h5>Account Settings</h5>
                     <div>
                         {editableName ? (
                             <>
@@ -275,8 +382,6 @@ const Profile = () => {
                     <div>
                         {editablePassword ? (
                             <form onSubmit={handleSavePassword}>
-                                <input type="hidden" value={userData.email} />
-
                                 <input
                                     type="password"
                                     placeholder="Current Password"
@@ -310,6 +415,71 @@ const Profile = () => {
                             </button>
                         )}
                     </div>
+
+                    <h5>Preferences Settings</h5>
+                    {userData && (
+                        <>
+                            <div>
+                                <p>Preferred cuisine</p>
+                                <Select
+                                    isMulti
+                                    options={cuisineOptions}
+                                    value={(
+                                        userData.preferredCuisine || []
+                                    ).map((cuisine) => ({
+                                        value: cuisine,
+                                        label: cuisine,
+                                    }))}
+                                    onChange={handlePreferredCuisineChange}
+                                />
+                            </div>
+
+                            <div>
+                                <p>Exclude cuisine</p>
+                                <Select
+                                    isMulti
+                                    options={cuisineOptions}
+                                    value={(userData.excludedCuisine || []).map(
+                                        (cuisine) => ({
+                                            value: cuisine,
+                                            label: cuisine,
+                                        })
+                                    )}
+                                    onChange={handleExcludedCuisineChange}
+                                />
+                            </div>
+
+                            <div>
+                                <p>Diet</p>
+                                <Select
+                                    isMulti
+                                    options={dietOptions}
+                                    value={(userData.diet || []).map(
+                                        (diet) => ({
+                                            value: diet,
+                                            label: diet,
+                                        })
+                                    )}
+                                    onChange={handleDietChange}
+                                />
+                            </div>
+
+                            <div>
+                                <p>Intolerances</p>
+                                <Select
+                                    isMulti
+                                    options={intolerancesOptions}
+                                    value={(userData.intolerances || []).map(
+                                        (intolerance) => ({
+                                            value: intolerance,
+                                            label: intolerance,
+                                        })
+                                    )}
+                                    onChange={handleIntolerancesChange}
+                                />
+                            </div>
+                        </>
+                    )}
                 </>
             )}
         </>

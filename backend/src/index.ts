@@ -284,14 +284,22 @@ app.delete("/admin/users/:userId", async (req, res) => {
     }
 });
 
-// User Profile Page Functionality
+// User Profile page functionality
 app.get("/profile", verifyUser, async (req, res) => {
     const userId = req.body.userId;
 
     try {
         const user = await prismaClient.user.findUnique({
             where: { id: userId },
-            select: { id: true, name: true, email: true },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                preferredCuisine: true,
+                excludedCuisine: true,
+                diet: true,
+                intolerances: true,
+            },
         });
 
         if (!user) {
@@ -307,12 +315,26 @@ app.get("/profile", verifyUser, async (req, res) => {
 
 app.put("/profile", async (req, res) => {
     const userId = req.body.userId;
-    const { name, email } = req.body;
+    const {
+        name,
+        email,
+        preferredCuisine,
+        excludedCuisine,
+        diet,
+        intolerances,
+    } = req.body;
 
     try {
         const updatedUser = await prismaClient.user.update({
             where: { id: userId },
-            data: { name, email },
+            data: {
+                name,
+                email,
+                preferredCuisine,
+                excludedCuisine,
+                diet,
+                intolerances,
+            },
         });
 
         return res.json(updatedUser);
@@ -358,6 +380,7 @@ app.post("/profile/change-password", verifyUser, async (req, res) => {
     }
 });
 
+// Run backend port
 app.listen(5000, () => {
     console.log("Running...");
 });

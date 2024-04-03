@@ -20,6 +20,10 @@ model User {
   password         String
   role             String             @default("client")
   favouriteRecipes FavouriteRecipes[]
+  preferredCuisine String[]
+  excludedCuisine  String[]
+  diet             String[]
+  intolerances     String[]
 }
 
 model FavouriteRecipes {
