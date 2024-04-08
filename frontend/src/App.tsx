@@ -4,6 +4,7 @@ import Register from "./pages/Auth/Register";
 import Home from "./pages/Client/Home";
 import Admin from "./pages/Admin/Admin";
 import Profile from "./pages/Client/Profile";
+import Recommend from "./pages/Client/Recommend";
 
 const App = () => {
     return (
@@ -15,6 +16,7 @@ const App = () => {
                     <Route path="/" element={<Home />}></Route>
                     <Route path="/admin" element={<Admin />}></Route>
                     <Route path="/profile" element={<Profile />}></Route>
+                    <Route path="/recommendations" element={<Recommend />}></Route>
                 </Routes>
             </BrowserRouter>
         </div>

@@ -9,23 +9,30 @@ export const searchRecipes = async (searchTerm: string, page: number) => {
         throw new Error("API Key not found");
     }
 
+    const recipesPerPage = 10; 
+
     const url = new URL("https://api.spoonacular.com/recipes/complexSearch");
     const queryParams = {
         apiKey,
         query: searchTerm,
-        number: "10",
-        offset: (page * 10).toString(),
+        number: recipesPerPage.toString(),
+        offset: ((page - 1) * recipesPerPage).toString(),
     };
     url.search = new URLSearchParams(queryParams).toString();
 
     try {
         const searchResponse = await fetch(url);
+        if (!searchResponse.ok) {
+            throw new Error(`Failed to fetch recipes. Status: ${searchResponse.status}`);
+        }
         const resultsJson = await searchResponse.json();
         return resultsJson;
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        throw new Error("Failed to fetch recipes");
     }
 };
+
 
 export const searchRecipesByIngredients = async (ingredients: string[], page: number) => {
     const apiKey = process.env.API_KEY;

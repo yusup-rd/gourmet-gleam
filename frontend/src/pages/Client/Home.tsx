@@ -16,14 +16,13 @@ const Home = () => {
     const [searchIngredients, setSearchIngredients] = useState<string[]>([]);
     const [searchType, setSearchType] = useState<string>("name");
     const [recipes, setRecipes] = useState<Recipe[]>([]);
-    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(
-        undefined
-    );
+    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(undefined);
     const [selectedTab, setSelectedTab] = useState<Tabs>("search");
     const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
     const [recipesDisplayed, setRecipesDisplayed] = useState<boolean>(false);
     const pageNumber = useRef(1);
-    const [searchClicked, setSearchClicked] = useState<boolean>(false);
+    const [searchClickedByName, setSearchClickedByName] = useState<boolean>(false);
+    const [searchClickedByIngredients, setSearchClickedByIngredients] = useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -38,52 +37,66 @@ const Home = () => {
                 if (userRole === "admin") {
                     navigate("/admin");
                     return;
-                } else if (searchClicked) {
-                    const favouriteRecipesResponse =
-                        await api.getFavouriteRecipes();
-                    setFavouriteRecipes(favouriteRecipesResponse.results);
+                } else {
+                    if (selectedTab === "favourites") {
+                        const favouriteRecipesResponse = await api.getFavouriteRecipes();
+                        setFavouriteRecipes(favouriteRecipesResponse.results);
+                    }
+                    if ((searchClickedByName && searchType === "name") || (searchClickedByIngredients && searchType === "ingredients")) {
+                        const pageNumberToUse = 1;
+                        let fetchedRecipes: Recipe[] = [];
+                        if ((searchType === "name" && searchTerm) || (searchType === "ingredients" && searchIngredients.length > 0)) {
+                            if (searchType === "name") {
+                                const response = await api.searchRecipes(searchTerm, pageNumberToUse);
+                                fetchedRecipes = response.results;
+                            } else {
+                                const response = await api.searchRecipesByIngredients(searchIngredients, pageNumberToUse);
+                                if (Array.isArray(response)) {
+                                    fetchedRecipes = response;
+                                } else {
+                                    console.error("Unexpected response format from API:", response);
+                                    return;
+                                }
+                            }
+                            setRecipes(fetchedRecipes);
+                            pageNumber.current = pageNumberToUse;
+                            setRecipesDisplayed(true);
+                        }
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
         fetchData();
-    }, [searchClicked, navigate]);
+    }, [selectedTab, searchClickedByName, searchClickedByIngredients, searchTerm, searchIngredients, searchType, navigate]);
 
     const handleSearchSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        setSearchClicked(true);
+        if (searchType === "name") {
+            setSearchClickedByName(true);
+        } else if (searchType === "ingredients") {
+            setSearchClickedByIngredients(true);
+        }
         try {
             let fetchedRecipes: Recipe[] = [];
             const pageNumberToUse = 1;
-            if (
-                (searchType === "name" && searchTerm) ||
-                (searchType === "ingredients" && searchIngredients.length > 0)
-            ) {
+            if ((searchType === "name" && searchTerm) || (searchType === "ingredients" && searchIngredients.length > 0)) {
                 if (searchType === "name") {
-                    const response = await api.searchRecipes(
-                        searchTerm,
-                        pageNumberToUse
-                    );
-                    fetchedRecipes = response.results; // Extract results array
+                    const response = await api.searchRecipes(searchTerm, pageNumberToUse);
+                    fetchedRecipes = response.results;
                 } else {
-                    const response = await api.searchRecipesByIngredients(
-                        searchIngredients,
-                        pageNumberToUse
-                    );
+                    const response = await api.searchRecipesByIngredients(searchIngredients, pageNumberToUse);
                     if (Array.isArray(response)) {
-                        fetchedRecipes = response; // Use response directly if it's an array
+                        fetchedRecipes = response;
                     } else {
-                        console.error(
-                            "Unexpected response format from API:",
-                            response
-                        );
-                        return; // Exit early if response is not an array
+                        console.error("Unexpected response format from API:", response);
+                        return;
                     }
                 }
                 setRecipes(fetchedRecipes);
                 pageNumber.current = pageNumberToUse;
-                setRecipesDisplayed(true); // Set to true when recipes are displayed
+                setRecipesDisplayed(true);
             }
         } catch (error) {
             console.error("Error searching recipes:", error);
@@ -95,34 +108,20 @@ const Home = () => {
         try {
             let nextRecipes: Recipe[] = [];
             let response;
-
             if (searchType === "name" && searchTerm) {
                 response = await api.searchRecipes(searchTerm, nextPage);
                 nextRecipes = response.results;
-                setRecipes((prevRecipes) => [...prevRecipes, ...nextRecipes]); // Update state with new recipes
-            } else if (
-                searchType === "ingredients" &&
-                searchIngredients.length > 0
-            ) {
-                response = await api.searchRecipesByIngredients(
-                    searchIngredients,
-                    nextPage
-                );
+                setRecipes((prevRecipes) => [...prevRecipes, ...nextRecipes]);
+            } else if (searchType === "ingredients" && searchIngredients.length > 0) {
+                response = await api.searchRecipesByIngredients(searchIngredients, nextPage);
                 if (Array.isArray(response)) {
                     nextRecipes = response;
                 } else if (response && Array.isArray(response.results)) {
                     nextRecipes = response.results;
                 }
-                // Filter out recipes that are already displayed
-                nextRecipes = nextRecipes.filter(
-                    (recipe) =>
-                        !recipes.find(
-                            (existingRecipe) => existingRecipe.id === recipe.id
-                        )
-                );
-                setRecipes((prevRecipes) => [...prevRecipes, ...nextRecipes]); // Update state with new recipes
+                nextRecipes = nextRecipes.filter((recipe) => !recipes.find((existingRecipe) => existingRecipe.id === recipe.id));
+                setRecipes((prevRecipes) => [...prevRecipes, ...nextRecipes]);
             }
-
             if (nextRecipes.length > 0) {
                 pageNumber.current = nextPage;
             } else {
@@ -147,18 +146,14 @@ const Home = () => {
         try {
             const userId = await getUserId();
             await api.removeFavouriteRecipe(recipe, userId);
-            const updatedRecipes = favouriteRecipes.filter(
-                (favRecipe) => recipe.id !== favRecipe.id
-            );
+            const updatedRecipes = favouriteRecipes.filter((favRecipe) => recipe.id !== favRecipe.id);
             setFavouriteRecipes(updatedRecipes);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleIngredientChange = (
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    const handleIngredientChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         const ingredientsArray = value.split(/[,\s]+/).filter(Boolean);
         setSearchIngredients(ingredientsArray);
@@ -180,7 +175,7 @@ const Home = () => {
 
     return (
         <div>
-            <Navbar /> {/* Render Navbar component */}
+            <Navbar />
             <div className="tabs">
                 <h1 onClick={() => setSelectedTab("search")}>Recipe Search</h1>
                 <h1 onClick={() => setSelectedTab("favourites")}>Favourites</h1>
@@ -194,9 +189,7 @@ const Home = () => {
                                 required
                                 placeholder="Enter a recipe name"
                                 value={searchTerm}
-                                onChange={(event) =>
-                                    setSearchTerm(event.target.value)
-                                }
+                                onChange={(event) => setSearchTerm(event.target.value)}
                             />
                         )}
                         {searchType === "ingredients" && (
@@ -213,74 +206,51 @@ const Home = () => {
                     <div>
                         <select
                             value={searchType}
-                            onChange={(event) =>
-                                handleSearchTypeChange(event.target.value)
-                            }
+                            onChange={(event) => handleSearchTypeChange(event.target.value)}
                         >
                             <option value="name">Search by Name</option>
-                            <option value="ingredients">
-                                Search by Ingredients
-                            </option>
+                            <option value="ingredients">Search by Ingredients</option>
                         </select>
                     </div>
                     {selectedTab === "search" && (
                         <>
                             {recipes.map((recipe, index) => {
-                                const isFavourite = favouriteRecipes.some(
-                                    (favRecipe) => recipe.id === favRecipe.id
-                                );
+                                const isFavourite = favouriteRecipes.some((favRecipe) => recipe.id === favRecipe.id);
                                 const uniqueKey = `${recipe.id}-${index}`;
-                                // Conditionally render RecipeCard based on searchType
                                 if (searchType === "name") {
                                     return (
                                         <RecipeCard
                                             key={uniqueKey}
                                             recipe={recipe}
-                                            onClick={() =>
-                                                setSelectedRecipe(recipe)
-                                            }
-                                            onFavouriteButtonClick={
-                                                isFavourite
-                                                    ? removeFavouriteRecipe
-                                                    : addFavouriteRecipe
-                                            }
+                                            onClick={() => setSelectedRecipe(recipe)}
+                                            onFavouriteButtonClick={isFavourite ? removeFavouriteRecipe : addFavouriteRecipe}
                                             isFavourite={isFavourite}
                                             searchType={searchType}
                                             selectedTab={selectedTab}
                                         />
                                     );
                                 } else {
-                                    // If searchType is ingredients, only render RecipeCard if it's not a favourite
                                     if (!isFavourite) {
                                         return (
                                             <RecipeCard
                                                 key={uniqueKey}
                                                 recipe={recipe}
-                                                onClick={() =>
-                                                    setSelectedRecipe(recipe)
-                                                }
-                                                onFavouriteButtonClick={
-                                                    isFavourite
-                                                        ? removeFavouriteRecipe
-                                                        : addFavouriteRecipe
-                                                }
+                                                onClick={() => setSelectedRecipe(recipe)}
+                                                onFavouriteButtonClick={isFavourite ? removeFavouriteRecipe : addFavouriteRecipe}
                                                 isFavourite={isFavourite}
                                                 searchType={searchType}
                                                 selectedTab={selectedTab}
                                             />
                                         );
                                     } else {
-                                        return null; // Skip rendering if it's a favourite recipe
+                                        return null;
                                     }
                                 }
                             })}
                         </>
                     )}
                     {recipesDisplayed && recipes.length > 0 && (
-                        <button
-                            className="view-more-button"
-                            onClick={handleViewMoreClick}
-                        >
+                        <button className="view-more-button" onClick={handleViewMoreClick}>
                             View More
                         </button>
                     )}

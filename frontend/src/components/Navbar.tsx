@@ -38,6 +38,11 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li className="nav-item">
+                        <Link to="/recommendations" className="dropdown-item">
+                            Recommendations
+                        </Link>
+                    </li>
+                    <li className="nav-item">
                         <Link to="/profile" className="dropdown-item">
                             My Profile
                         </Link>
