@@ -380,6 +380,38 @@ app.post("/profile/change-password", verifyUser, async (req, res) => {
     }
 });
 
+// Recommendation page functionality
+app.get("/recommendations", verifyUser, async (req, res) => {
+    const userId = req.body.userId;
+
+    try {
+        const user: {
+            preferredCuisine: string[];
+            excludedCuisine: string[];
+            diet: string[];
+            intolerances: string[];
+        } | null = await prismaClient.user.findUnique({
+            where: { id: userId },
+            select: {
+                preferredCuisine: true,
+                excludedCuisine: true,
+                diet: true,
+                intolerances: true,
+            },
+        });
+
+        if (!user) {
+            return res.json({ message: "Set your preferences first to use the recommendation system." });
+        }
+
+        return res.json(user);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to fetch user preferences" });
+    }
+});
+
+
 // Run backend port
 app.listen(5000, () => {
     console.log("Running...");
