@@ -401,16 +401,51 @@ app.get("/recommendations", verifyUser, async (req, res) => {
         });
 
         if (!user) {
-            return res.json({ message: "Set your preferences first to use the recommendation system." });
+            return res.json({
+                message:
+                    "Set your preferences first to use the recommendation system.",
+            });
         }
 
         return res.json(user);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Failed to fetch user preferences" });
+        return res
+            .status(500)
+            .json({ error: "Failed to fetch user preferences" });
     }
 });
 
+app.get("/recommendations/recipes", async (req: Request, res: Response) => {
+    const { preferredCuisine, excludedCuisine, diet, intolerances } = req.query;
+    const page = parseInt(req.query.page as string);
+
+    const preferences = {
+        cuisine: preferredCuisine as string | undefined,
+        excludeCuisine: excludedCuisine as string | undefined,
+        diet: diet as string | undefined,
+        intolerances: intolerances as string | undefined,
+    };
+
+    console.log(
+        "Preferences received in rec/rec: ",
+        preferences,
+        "Page number received: ",
+        page
+    );
+
+    try {
+        const results = await RecipeAPI.searchPreferredRecipes(
+            preferences,
+            page
+        );
+        res.json(results);
+        console.log("Results received in rec/rec: ", results);
+    } catch (error) {
+        console.error("Error fetching recipes:", error);
+        res.status(500).json({ message: "Failed to fetch recipes" });
+    }
+});
 
 // Run backend port
 app.listen(5000, () => {
