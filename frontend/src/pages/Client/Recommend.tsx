@@ -16,8 +16,9 @@ const Recommend = () => {
         useState<UserPreferences | null>(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [recipes, setRecipes] = useState<Recipe[]>([]);
-
-    const [recipesFetched, setRecipesFetched] = useState(false);
+    const [page, setPage] = useState(1);
+    const [recipesFetched, setRecipesFetched] = useState(true);
+    const [moreRecipesAvailable, setMoreRecipesAvailable] = useState(true);
 
     useEffect(() => {
         const fetchUserPreferences = async () => {
@@ -44,35 +45,54 @@ const Recommend = () => {
     }, []);
 
     useEffect(() => {
-        if (userPreferences && !recipesFetched) {
-            fetchRecipes(userPreferences);
-            setRecipesFetched(true);
+        if (userPreferences && recipesFetched) {
+            fetchRecipes(userPreferences, page);
+            setRecipesFetched(false);
         }
-    }, [userPreferences, recipesFetched]);
+    }, [userPreferences, recipesFetched, page]);
 
-    const fetchRecipes = async (userPreferences: UserPreferences) => {
+    const fetchRecipes = async (
+        userPreferences: UserPreferences,
+        page: number
+    ) => {
         const { preferredCuisine, excludedCuisine, diet, intolerances } =
             userPreferences;
-        const page = 1;
-
-        const preferences = [
-            ...preferredCuisine.map((cuisine) => `preferredCuisine=${cuisine}`),
-            ...excludedCuisine.map((cuisine) => `excludedCuisine=${cuisine}`),
-            ...diet.map((d) => `diet=${d}`),
-            ...intolerances.map((intolerance) => `intolerances=${intolerance}`),
-        ].join("&");
 
         try {
-            console.log("Preferences passed from Front end: ", preferences);
+            const preferences = [
+                ...preferredCuisine.map(
+                    (cuisine) => `preferredCuisine=${cuisine}`
+                ),
+                ...excludedCuisine.map(
+                    (cuisine) => `excludedCuisine=${cuisine}`
+                ),
+                ...diet.map((d) => `diet=${d}`),
+                ...intolerances.map(
+                    (intolerance) => `intolerances=${intolerance}`
+                ),
+            ].join("&");
+
             const response = await axios.get(
                 `http://localhost:5000/recommendations/recipes?${preferences}&page=${page}`
             );
 
-            setRecipes(response.data.results);
+            if (response.data.results.length === 0) {
+                setMoreRecipesAvailable(false);
+            } else {
+                setRecipes((prevRecipes) => [
+                    ...prevRecipes,
+                    ...response.data.results,
+                ]);
+            }
         } catch (error) {
             console.error("Error fetching recipes:", error);
             setErrorMessage("Failed to fetch recipes");
         }
+    };
+
+    const handleViewMoreClick = () => {
+        setPage((prevPage) => prevPage + 1);
+        setRecipesFetched(true);
     };
 
     return (
@@ -214,6 +234,13 @@ const Recommend = () => {
                                         <li key={index}>{recipe.title}</li>
                                     ))}
                                 </ul>
+                                {moreRecipesAvailable ? (
+                                    <button onClick={handleViewMoreClick}>
+                                        View More
+                                    </button>
+                                ) : (
+                                    <p>That's all recommendations available.</p>
+                                )}
                             </div>
                         )}
                     </div>
