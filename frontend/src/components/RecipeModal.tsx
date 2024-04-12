@@ -21,7 +21,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
     const [recipeWithSteps, setRecipeWithSteps] =
         useState<RecipeWithSteps | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-    const [showSummary, setShowSummary] = useState<boolean>(true); // Initially show summary
+    const [showSummary, setShowSummary] = useState<boolean>(true);
     const [showIngredients, setShowIngredients] = useState<boolean>(false);
 
     useEffect(() => {
@@ -55,7 +55,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                     await RecipeAPI.getRecipeIngredients(recipeId);
                 setIngredients(ingredientsResponse.ingredients);
             } catch (error) {
-                console.log(error);
+                console.error("Error fetching recipe data:", error);
             }
         };
 
@@ -67,16 +67,16 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
     }
 
     return (
-        <div className="overlay">
-            <div className="modal">
-                <div className="modal-content">
-                    <div className="modal-header">
+        <div className="recipe-modal-overlay">
+            <div className="recipe-modal">
+                <div className="recipe-modal-content">
+                    <div className="recipe-modal-header">
                         <h2>{recipeSummary.title}</h2>
                         <span className="close-btn" onClick={onClose}>
                             &times;
                         </span>
                     </div>
-                    <div className="modal-body">
+                    <div className="recipe-modal-body">
                         <img src={recipe.image} alt="Recipe" />
                         <div className="button-group">
                             <button
@@ -130,15 +130,17 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                             <>
                                 <h3>Instructions:</h3>
                                 <ol>
-                                    {recipeWithSteps.steps.map((step) => (
-                                        <li key={step.number}>
-                                            <p
-                                                dangerouslySetInnerHTML={{
-                                                    __html: step.step,
-                                                }}
-                                            ></p>
-                                        </li>
-                                    ))}
+                                    {recipeWithSteps.steps.map(
+                                        (step, index) => (
+                                            <li key={index}>
+                                                <p
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: step.step,
+                                                    }}
+                                                ></p>
+                                            </li>
+                                        )
+                                    )}
                                 </ol>
                             </>
                         )}

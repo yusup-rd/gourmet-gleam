@@ -3,6 +3,10 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import { Recipe } from "../../types";
+import RecipeCard from "../../components/RecipeCard";
+import RecipeModal from "../../components/RecipeModal";
+import * as api from "../../api";
+import { getUserId } from "../Auth/authApi";
 
 interface UserPreferences {
     preferredCuisine: string[];
@@ -19,6 +23,10 @@ const Recommend = () => {
     const [page, setPage] = useState(1);
     const [recipesFetched, setRecipesFetched] = useState(true);
     const [moreRecipesAvailable, setMoreRecipesAvailable] = useState(true);
+    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(
+        undefined
+    );
+    const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
 
     useEffect(() => {
         const fetchUserPreferences = async () => {
@@ -93,6 +101,29 @@ const Recommend = () => {
     const handleViewMoreClick = () => {
         setPage((prevPage) => prevPage + 1);
         setRecipesFetched(true);
+    };
+
+    const addFavouriteRecipe = async (recipe: Recipe) => {
+        try {
+            const userId = await getUserId();
+            await api.addFavouriteRecipe(recipe, userId);
+            setFavouriteRecipes([...favouriteRecipes, recipe]);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const removeFavouriteRecipe = async (recipe: Recipe) => {
+        try {
+            const userId = await getUserId();
+            await api.removeFavouriteRecipe(recipe, userId);
+            const updatedRecipes = favouriteRecipes.filter(
+                (favRecipe) => favRecipe.id !== recipe.id
+            );
+            setFavouriteRecipes(updatedRecipes);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
@@ -230,9 +261,38 @@ const Recommend = () => {
                             <div>
                                 <h2>Recommended Recipes</h2>
                                 <ul>
-                                    {recipes.map((recipe, index) => (
-                                        <li key={index}>{recipe.title}</li>
-                                    ))}
+                                    {recipes.map((recipe, index) => {
+                                        const isFavourite =
+                                            favouriteRecipes.some(
+                                                (favRecipe) =>
+                                                    favRecipe.id === recipe.id
+                                            );
+                                        const uniqueKey = `${recipe.id}-${index}`;
+                                        return (
+                                            <li key={uniqueKey}>
+                                                <RecipeCard
+                                                    recipe={recipe}
+                                                    onClick={() =>
+                                                        setSelectedRecipe(
+                                                            recipe
+                                                        )
+                                                    }
+                                                    onFavouriteButtonClick={() =>
+                                                        isFavourite
+                                                            ? removeFavouriteRecipe(
+                                                                  recipe
+                                                              )
+                                                            : addFavouriteRecipe(
+                                                                  recipe
+                                                              )
+                                                    }
+                                                    isFavourite={isFavourite}
+                                                    searchType="name"
+                                                    selectedTab="search"
+                                                />
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
                                 {moreRecipesAvailable ? (
                                     <button onClick={handleViewMoreClick}>
@@ -248,6 +308,13 @@ const Recommend = () => {
                     <p>Loading...</p>
                 )}
             </div>
+            {selectedRecipe && (
+                <RecipeModal
+                    recipeId={selectedRecipe.id.toString()}
+                    recipe={selectedRecipe}
+                    onClose={() => setSelectedRecipe(undefined)}
+                />
+            )}
         </>
     );
 };

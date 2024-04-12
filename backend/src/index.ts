@@ -426,21 +426,12 @@ app.get("/recommendations/recipes", async (req: Request, res: Response) => {
         diet: diet as string | undefined,
         intolerances: intolerances as string | undefined,
     };
-
-    console.log(
-        "Preferences received in rec/rec: ",
-        preferences,
-        "Page number received: ",
-        page
-    );
-
     try {
         const results = await RecipeAPI.searchPreferredRecipes(
             preferences,
             page
         );
         res.json(results);
-        console.log("Results received in rec/rec: ", results);
     } catch (error) {
         console.error("Error fetching recipes:", error);
         res.status(500).json({ message: "Failed to fetch recipes" });

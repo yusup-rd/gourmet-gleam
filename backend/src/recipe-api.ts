@@ -182,7 +182,6 @@ export const searchPreferredRecipes = async (
     }
 
     url.search = new URLSearchParams(queryParams).toString();
-    console.log("URL passed to spoonacular API: ", url);
     try {
         const searchResponse = await fetch(url);
         if (!searchResponse.ok) {

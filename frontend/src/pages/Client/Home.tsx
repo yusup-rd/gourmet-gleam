@@ -16,13 +16,17 @@ const Home = () => {
     const [searchIngredients, setSearchIngredients] = useState<string[]>([]);
     const [searchType, setSearchType] = useState<string>("name");
     const [recipes, setRecipes] = useState<Recipe[]>([]);
-    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(undefined);
+    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(
+        undefined
+    );
     const [selectedTab, setSelectedTab] = useState<Tabs>("search");
     const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
     const [recipesDisplayed, setRecipesDisplayed] = useState<boolean>(false);
     const pageNumber = useRef(1);
-    const [searchClickedByName, setSearchClickedByName] = useState<boolean>(false);
-    const [searchClickedByIngredients, setSearchClickedByIngredients] = useState<boolean>(false);
+    const [searchClickedByName, setSearchClickedByName] =
+        useState<boolean>(false);
+    const [searchClickedByIngredients, setSearchClickedByIngredients] =
+        useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,22 +43,41 @@ const Home = () => {
                     return;
                 } else {
                     if (selectedTab === "favourites") {
-                        const favouriteRecipesResponse = await api.getFavouriteRecipes();
+                        const favouriteRecipesResponse =
+                            await api.getFavouriteRecipes();
                         setFavouriteRecipes(favouriteRecipesResponse.results);
                     }
-                    if ((searchClickedByName && searchType === "name") || (searchClickedByIngredients && searchType === "ingredients")) {
+                    if (
+                        (searchClickedByName && searchType === "name") ||
+                        (searchClickedByIngredients &&
+                            searchType === "ingredients")
+                    ) {
                         const pageNumberToUse = 1;
                         let fetchedRecipes: Recipe[] = [];
-                        if ((searchType === "name" && searchTerm) || (searchType === "ingredients" && searchIngredients.length > 0)) {
+                        if (
+                            (searchType === "name" && searchTerm) ||
+                            (searchType === "ingredients" &&
+                                searchIngredients.length > 0)
+                        ) {
                             if (searchType === "name") {
-                                const response = await api.searchRecipes(searchTerm, pageNumberToUse);
+                                const response = await api.searchRecipes(
+                                    searchTerm,
+                                    pageNumberToUse
+                                );
                                 fetchedRecipes = response.results;
                             } else {
-                                const response = await api.searchRecipesByIngredients(searchIngredients, pageNumberToUse);
+                                const response =
+                                    await api.searchRecipesByIngredients(
+                                        searchIngredients,
+                                        pageNumberToUse
+                                    );
                                 if (Array.isArray(response)) {
                                     fetchedRecipes = response;
                                 } else {
-                                    console.error("Unexpected response format from API:", response);
+                                    console.error(
+                                        "Unexpected response format from API:",
+                                        response
+                                    );
                                     return;
                                 }
                             }
@@ -69,7 +92,15 @@ const Home = () => {
             }
         };
         fetchData();
-    }, [selectedTab, searchClickedByName, searchClickedByIngredients, searchTerm, searchIngredients, searchType, navigate]);
+    }, [
+        selectedTab,
+        searchClickedByName,
+        searchClickedByIngredients,
+        searchTerm,
+        searchIngredients,
+        searchType,
+        navigate,
+    ]);
 
     const handleSearchSubmit = async (event: FormEvent) => {
         event.preventDefault();
@@ -81,16 +112,28 @@ const Home = () => {
         try {
             let fetchedRecipes: Recipe[] = [];
             const pageNumberToUse = 1;
-            if ((searchType === "name" && searchTerm) || (searchType === "ingredients" && searchIngredients.length > 0)) {
+            if (
+                (searchType === "name" && searchTerm) ||
+                (searchType === "ingredients" && searchIngredients.length > 0)
+            ) {
                 if (searchType === "name") {
-                    const response = await api.searchRecipes(searchTerm, pageNumberToUse);
+                    const response = await api.searchRecipes(
+                        searchTerm,
+                        pageNumberToUse
+                    );
                     fetchedRecipes = response.results;
                 } else {
-                    const response = await api.searchRecipesByIngredients(searchIngredients, pageNumberToUse);
+                    const response = await api.searchRecipesByIngredients(
+                        searchIngredients,
+                        pageNumberToUse
+                    );
                     if (Array.isArray(response)) {
                         fetchedRecipes = response;
                     } else {
-                        console.error("Unexpected response format from API:", response);
+                        console.error(
+                            "Unexpected response format from API:",
+                            response
+                        );
                         return;
                     }
                 }
@@ -112,14 +155,25 @@ const Home = () => {
                 response = await api.searchRecipes(searchTerm, nextPage);
                 nextRecipes = response.results;
                 setRecipes((prevRecipes) => [...prevRecipes, ...nextRecipes]);
-            } else if (searchType === "ingredients" && searchIngredients.length > 0) {
-                response = await api.searchRecipesByIngredients(searchIngredients, nextPage);
+            } else if (
+                searchType === "ingredients" &&
+                searchIngredients.length > 0
+            ) {
+                response = await api.searchRecipesByIngredients(
+                    searchIngredients,
+                    nextPage
+                );
                 if (Array.isArray(response)) {
                     nextRecipes = response;
                 } else if (response && Array.isArray(response.results)) {
                     nextRecipes = response.results;
                 }
-                nextRecipes = nextRecipes.filter((recipe) => !recipes.find((existingRecipe) => existingRecipe.id === recipe.id));
+                nextRecipes = nextRecipes.filter(
+                    (recipe) =>
+                        !recipes.find(
+                            (existingRecipe) => existingRecipe.id === recipe.id
+                        )
+                );
                 setRecipes((prevRecipes) => [...prevRecipes, ...nextRecipes]);
             }
             if (nextRecipes.length > 0) {
@@ -146,14 +200,22 @@ const Home = () => {
         try {
             const userId = await getUserId();
             await api.removeFavouriteRecipe(recipe, userId);
-            const updatedRecipes = favouriteRecipes.filter((favRecipe) => recipe.id !== favRecipe.id);
+            const updatedRecipes = favouriteRecipes.filter(
+                (favRecipe) => recipe.id !== favRecipe.id
+            );
             setFavouriteRecipes(updatedRecipes);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleIngredientChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCloseModal = () => {
+        setSelectedRecipe(undefined);
+    };
+
+    const handleIngredientChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
         const value = event.target.value;
         const ingredientsArray = value.split(/[,\s]+/).filter(Boolean);
         setSearchIngredients(ingredientsArray);
@@ -189,7 +251,9 @@ const Home = () => {
                                 required
                                 placeholder="Enter a recipe name"
                                 value={searchTerm}
-                                onChange={(event) => setSearchTerm(event.target.value)}
+                                onChange={(event) =>
+                                    setSearchTerm(event.target.value)
+                                }
                             />
                         )}
                         {searchType === "ingredients" && (
@@ -206,24 +270,36 @@ const Home = () => {
                     <div>
                         <select
                             value={searchType}
-                            onChange={(event) => handleSearchTypeChange(event.target.value)}
+                            onChange={(event) =>
+                                handleSearchTypeChange(event.target.value)
+                            }
                         >
                             <option value="name">Search by Name</option>
-                            <option value="ingredients">Search by Ingredients</option>
+                            <option value="ingredients">
+                                Search by Ingredients
+                            </option>
                         </select>
                     </div>
                     {selectedTab === "search" && (
                         <>
                             {recipes.map((recipe, index) => {
-                                const isFavourite = favouriteRecipes.some((favRecipe) => recipe.id === favRecipe.id);
+                                const isFavourite = favouriteRecipes.some(
+                                    (favRecipe) => recipe.id === favRecipe.id
+                                );
                                 const uniqueKey = `${recipe.id}-${index}`;
                                 if (searchType === "name") {
                                     return (
                                         <RecipeCard
                                             key={uniqueKey}
                                             recipe={recipe}
-                                            onClick={() => setSelectedRecipe(recipe)}
-                                            onFavouriteButtonClick={isFavourite ? removeFavouriteRecipe : addFavouriteRecipe}
+                                            onClick={() =>
+                                                setSelectedRecipe(recipe)
+                                            }
+                                            onFavouriteButtonClick={
+                                                isFavourite
+                                                    ? removeFavouriteRecipe
+                                                    : addFavouriteRecipe
+                                            }
                                             isFavourite={isFavourite}
                                             searchType={searchType}
                                             selectedTab={selectedTab}
@@ -235,8 +311,14 @@ const Home = () => {
                                             <RecipeCard
                                                 key={uniqueKey}
                                                 recipe={recipe}
-                                                onClick={() => setSelectedRecipe(recipe)}
-                                                onFavouriteButtonClick={isFavourite ? removeFavouriteRecipe : addFavouriteRecipe}
+                                                onClick={() =>
+                                                    setSelectedRecipe(recipe)
+                                                }
+                                                onFavouriteButtonClick={
+                                                    isFavourite
+                                                        ? removeFavouriteRecipe
+                                                        : addFavouriteRecipe
+                                                }
                                                 isFavourite={isFavourite}
                                                 searchType={searchType}
                                                 selectedTab={selectedTab}
@@ -250,7 +332,10 @@ const Home = () => {
                         </>
                     )}
                     {recipesDisplayed && recipes.length > 0 && (
-                        <button className="view-more-button" onClick={handleViewMoreClick}>
+                        <button
+                            className="view-more-button"
+                            onClick={handleViewMoreClick}
+                        >
                             View More
                         </button>
                     )}
@@ -275,7 +360,7 @@ const Home = () => {
                 <RecipeModal
                     recipeId={selectedRecipe.id.toString()}
                     recipe={selectedRecipe}
-                    onClose={() => setSelectedRecipe(undefined)}
+                    onClose={handleCloseModal}
                 />
             )}
         </div>
