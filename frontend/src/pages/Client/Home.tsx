@@ -96,8 +96,6 @@ const Home = () => {
         selectedTab,
         searchClickedByName,
         searchClickedByIngredients,
-        searchTerm,
-        searchIngredients,
         searchType,
         navigate,
     ]);
@@ -287,47 +285,23 @@ const Home = () => {
                                     (favRecipe) => recipe.id === favRecipe.id
                                 );
                                 const uniqueKey = `${recipe.id}-${index}`;
-                                if (searchType === "name") {
-                                    return (
-                                        <RecipeCard
-                                            key={uniqueKey}
-                                            recipe={recipe}
-                                            onClick={() =>
-                                                setSelectedRecipe(recipe)
-                                            }
-                                            onFavouriteButtonClick={
-                                                isFavourite
-                                                    ? removeFavouriteRecipe
-                                                    : addFavouriteRecipe
-                                            }
-                                            isFavourite={isFavourite}
-                                            searchType={searchType}
-                                            selectedTab={selectedTab}
-                                        />
-                                    );
-                                } else {
-                                    if (!isFavourite) {
-                                        return (
-                                            <RecipeCard
-                                                key={uniqueKey}
-                                                recipe={recipe}
-                                                onClick={() =>
-                                                    setSelectedRecipe(recipe)
-                                                }
-                                                onFavouriteButtonClick={
-                                                    isFavourite
-                                                        ? removeFavouriteRecipe
-                                                        : addFavouriteRecipe
-                                                }
-                                                isFavourite={isFavourite}
-                                                searchType={searchType}
-                                                selectedTab={selectedTab}
-                                            />
-                                        );
-                                    } else {
-                                        return null;
-                                    }
-                                }
+                                return (
+                                    <RecipeCard
+                                        key={uniqueKey}
+                                        recipe={recipe}
+                                        onClick={() =>
+                                            setSelectedRecipe(recipe)
+                                        }
+                                        onFavouriteButtonClick={
+                                            isFavourite
+                                                ? removeFavouriteRecipe
+                                                : addFavouriteRecipe
+                                        }
+                                        isFavourite={isFavourite}
+                                        searchType={searchType}
+                                        selectedTab={selectedTab}
+                                    />
+                                );
                             })}
                         </>
                     )}

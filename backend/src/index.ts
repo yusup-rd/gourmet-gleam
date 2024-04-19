@@ -438,6 +438,29 @@ app.get("/recommendations/recipes", async (req: Request, res: Response) => {
     }
 });
 
+app.get("/recommendations/favourites", verifyUser, async (req, res) => {
+    const userId = req.body.userId;
+
+    try {
+        const user = await prismaClient.user.findUnique({
+            where: { id: userId },
+            include: {
+                favouriteRecipes: true,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.json(user.favouriteRecipes);
+    } catch (error) {
+        console.error("Error fetching favourite recipes:", error);
+        return res
+            .status(500)
+            .json({ error: "Failed to fetch favourite recipes" });
+    }
+});
+
 // Run backend port
 app.listen(5000, () => {
     console.log("Running...");

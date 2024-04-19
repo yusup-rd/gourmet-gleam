@@ -27,6 +27,7 @@ const Recommend = () => {
         undefined
     );
     const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
+    const [favouriteRecipeIds, setFavouriteRecipeIds] = useState<number[]>([]);
 
     useEffect(() => {
         const fetchUserPreferences = async () => {
@@ -58,6 +59,32 @@ const Recommend = () => {
             setRecipesFetched(false);
         }
     }, [userPreferences, recipesFetched, page]);
+
+    useEffect(() => {
+        const fetchFavourites = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:5000/recommendations/favourites",
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                if (response.data) {
+                    const recipeIds = response.data.map(
+                        (fav: any) => fav.recipeId
+                    );
+                    setFavouriteRecipeIds(recipeIds);
+                } else {
+                    console.log("Unable to fetch favs");
+                }
+            } catch (error) {
+                console.error("Error fetching favourites:", error);
+            }
+        };
+
+        fetchFavourites();
+    }, []);
 
     const fetchRecipes = async (
         userPreferences: UserPreferences,
@@ -121,6 +148,31 @@ const Recommend = () => {
                 (favRecipe) => favRecipe.id !== recipe.id
             );
             setFavouriteRecipes(updatedRecipes);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const toggleFavourite = async (recipeId: number) => {
+        try {
+            const recipe = recipes.find((recipe) => recipe.id === recipeId);
+
+            if (!recipe) {
+                console.error("Recipe not found");
+                return;
+            }
+
+            if (favouriteRecipeIds.includes(recipeId)) {
+                await removeFavouriteRecipe(recipe);
+                const updatedRecipeIds = favouriteRecipeIds.filter(
+                    (id) => id !== recipeId
+                );
+                setFavouriteRecipeIds(updatedRecipeIds);
+            } else {
+                await addFavouriteRecipe(recipe);
+                const updatedRecipeIds = [...favouriteRecipeIds, recipeId];
+                setFavouriteRecipeIds(updatedRecipeIds);
+            }
         } catch (error) {
             console.error(error);
         }
@@ -263,9 +315,8 @@ const Recommend = () => {
                                 <ul>
                                     {recipes.map((recipe, index) => {
                                         const isFavourite =
-                                            favouriteRecipes.some(
-                                                (favRecipe) =>
-                                                    favRecipe.id === recipe.id
+                                            favouriteRecipeIds.includes(
+                                                recipe.id
                                             );
                                         const uniqueKey = `${recipe.id}-${index}`;
                                         return (
@@ -278,13 +329,9 @@ const Recommend = () => {
                                                         )
                                                     }
                                                     onFavouriteButtonClick={() =>
-                                                        isFavourite
-                                                            ? removeFavouriteRecipe(
-                                                                  recipe
-                                                              )
-                                                            : addFavouriteRecipe(
-                                                                  recipe
-                                                              )
+                                                        toggleFavourite(
+                                                            recipe.id
+                                                        )
                                                     }
                                                     isFavourite={isFavourite}
                                                     searchType="name"
