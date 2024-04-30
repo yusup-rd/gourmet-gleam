@@ -5,7 +5,10 @@ import axios from "axios";
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [emailForReset, setEmailForReset] = useState("");
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [showEmailInput, setShowEmailInput] = useState(false); // State to track whether to show the email input
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,6 +23,22 @@ const Login = () => {
             navigate("/");
         } catch (error) {
             setError("Login failed. Please check your credentials.");
+        }
+    };
+
+    const handleForgotPassword = async () => {
+        setShowEmailInput(true); // Show the email input when user clicks on Forgot Password
+    };
+
+    const handlePasswordReset = async () => {
+        try {
+            await axios.post("http://localhost:5000/password-reset", {
+                email: emailForReset, // Corrected here
+            });
+            console.log("Email sent to backend is: ", emailForReset); // Also corrected here
+            setSuccessMessage("OTP sent to your email. Please check your inbox.");
+        } catch (error) {
+            setError("Failed to send OTP. Please try again.");
         }
     };
 
@@ -48,7 +67,23 @@ const Login = () => {
                 <button type="submit">Login</button>
             </form>
             <Link to="/register">Create new account</Link>
+            <br />
+            {/* Show the input only when the user clicks on Forgot Password */}
+            {!showEmailInput && <button onClick={handleForgotPassword}>Forgot Password</button>}
+            {showEmailInput && (
+                <div>
+                    <input
+                        type="email"
+                        placeholder="Email for Password Reset"
+                        value={emailForReset}
+                        onChange={(e) => setEmailForReset(e.target.value)}
+                        autoComplete="on"
+                    />
+                    <button onClick={handlePasswordReset}>Send OTP</button>
+                </div>
+            )}
             {error && <div>{error}</div>}
+            {successMessage && <div>{successMessage}</div>}
         </div>
     );
 };

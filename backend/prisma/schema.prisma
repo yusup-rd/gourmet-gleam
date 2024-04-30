@@ -14,16 +14,17 @@ datasource db {
 }
 
 model User {
-  id               Int                @id @default(autoincrement())
-  name             String
-  email            String             @unique
-  password         String
-  role             String             @default("client")
-  favouriteRecipes FavouriteRecipes[]
-  preferredCuisine String[]
-  excludedCuisine  String[]
-  diet             String[]
-  intolerances     String[]
+  id                Int                @id @default(autoincrement())
+  name              String
+  email             String             @unique
+  password          String
+  role              String             @default("client")
+  preferredCuisine  String[]
+  excludedCuisine   String[]
+  diet              String[]
+  intolerances      String[]
+  favouriteRecipes  FavouriteRecipes[]
+  passwordResetOTPs PasswordResetOTP[]
 }
 
 model FavouriteRecipes {
@@ -31,4 +32,12 @@ model FavouriteRecipes {
   user     User @relation(fields: [userId], references: [id])
   userId   Int
   recipeId Int  @unique
+}
+
+model PasswordResetOTP {
+  id        Int      @id @default(autoincrement())
+  otp       String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId Int
 }

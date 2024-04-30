@@ -3,6 +3,8 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
+import nodemailer, { TransportOptions } from "nodemailer";
+import { authenticator } from "otplib";
 import { PrismaClient } from "@prisma/client";
 import * as RecipeAPI from "./recipe-api";
 
@@ -109,6 +111,94 @@ app.get("/user-role", verifyUser, (req, res) => {
 app.get("/user-id", verifyUser, (req, res) => {
     const userId = req.body.id;
     res.json({ userId: userId });
+});
+
+// Password Reset Nodemailer and OTP
+const OTP_EXPIRATION_TIME = 600;
+
+app.post("/password-reset", async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        // Generate OTP
+        const secret = authenticator.generateSecret();
+        const otp = authenticator.generate(secret);
+
+        // Save OTP to database
+        const expiration = new Date(Date.now() + OTP_EXPIRATION_TIME * 1000); // Set expiration time
+        await prismaClient.passwordResetOTP.create({
+            data: {
+                user: { connect: { email: email } },
+                otp: otp,
+                expiresAt: expiration,
+            },
+        });
+
+        // Send Email
+        const transporter = nodemailer.createTransport({
+            host: "live.smtp.mailtrap.io",
+            port: 587,
+            auth: {
+                user: "api",
+                pass: "c2519fe3f71d5bd4432bf476ffe5e40f",
+            },
+            secure: false,
+            tls: {
+                rejectUnauthorized: false,
+            },
+        });
+        const mailOptions = {
+            from: "Gourmet Gleam <gourmetgleam@demomailtrap.com>",
+            to: email,
+            subject: "Password Reset OTP",
+            html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p>`,
+        };
+        await transporter.sendMail(mailOptions);
+
+        return res.json({ message: "OTP sent successfully" });
+    } catch (error) {
+        console.error("Error generating OTP:", error);
+        return res.status(500).json({ error: "Failed to generate OTP" });
+    }
+});
+
+// OTP verification endpoint
+app.post("/password-reset/verify", async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    try {
+        // Retrieve stored OTP from the database
+        const storedOTP = await prismaClient.passwordResetOTP.findFirst({
+            where: {
+                user: { email: email },
+                otp: otp,
+                expiresAt: { gte: new Date() }, // Check if OTP is not expired
+            },
+        });
+
+        if (!storedOTP) {
+            return res
+                .status(400)
+                .json({ error: "Invalid OTP or OTP expired" });
+        }
+
+        // Reset Password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await prismaClient.user.update({
+            where: { email: email },
+            data: { password: hashedNewPassword },
+        });
+
+        // Delete the stored OTP from the database
+        await prismaClient.passwordResetOTP.delete({
+            where: { id: storedOTP.id },
+        });
+
+        return res.json({ message: "Password reset successfully" });
+    } catch (error) {
+        console.error("Error resetting password:", error);
+        return res.status(500).json({ error: "Failed to reset password" });
+    }
 });
 
 // Home page functionality
