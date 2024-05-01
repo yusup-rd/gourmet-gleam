@@ -9,6 +9,7 @@ interface ResetModalProps {
 const ResetModal = ({ onClose, email }: ResetModalProps) => {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [page, setPage] = useState<"otp" | "password">("otp");
   const [error, setError] = useState<string>("");
 
@@ -31,6 +32,11 @@ const ResetModal = ({ onClose, email }: ResetModalProps) => {
   
   const handlePasswordReset = async () => {
     try {
+      if (newPassword !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+      
       const response = await axios.post("http://localhost:5000/password-reset/confirm-password", {
         email,
         otp,
@@ -46,7 +52,6 @@ const ResetModal = ({ onClose, email }: ResetModalProps) => {
       setError("Failed to reset password");
     }
   };
-  
 
   return (
     <div className="modal fade show" style={{ display: "block" }} tabIndex={-1}>
@@ -89,6 +94,13 @@ const ResetModal = ({ onClose, email }: ResetModalProps) => {
                   placeholder="Enter New Password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <input
+                  type="password"
+                  className="form-control mt-3"
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <button
                   className="btn btn-primary mt-3"
