@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import ResetModal from "../../components/ResetModal";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -8,7 +9,9 @@ const Login = () => {
     const [emailForReset, setEmailForReset] = useState("");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
-    const [showEmailInput, setShowEmailInput] = useState(false); // State to track whether to show the email input
+    const [sendingOTP, setSendingOTP] = useState(false);
+    const [showEmailInput, setShowEmailInput] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(false);
     const navigate = useNavigate();
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,19 +30,27 @@ const Login = () => {
     };
 
     const handleForgotPassword = async () => {
-        setShowEmailInput(true); // Show the email input when user clicks on Forgot Password
+        setShowEmailInput(true);
     };
 
     const handlePasswordReset = async () => {
         try {
+            setSendingOTP(true);
             await axios.post("http://localhost:5000/password-reset", {
-                email: emailForReset, // Corrected here
+                email: emailForReset,
             });
-            console.log("Email sent to backend is: ", emailForReset); // Also corrected here
             setSuccessMessage("OTP sent to your email. Please check your inbox.");
+            setShowResetModal(true);
         } catch (error) {
             setError("Failed to send OTP. Please try again.");
+        } finally {
+            setSendingOTP(false);
         }
+    };
+
+    const handleResetModalClose = () => {
+        setShowResetModal(false); 
+        setSuccessMessage("");
     };
 
     return (
@@ -68,7 +79,6 @@ const Login = () => {
             </form>
             <Link to="/register">Create new account</Link>
             <br />
-            {/* Show the input only when the user clicks on Forgot Password */}
             {!showEmailInput && <button onClick={handleForgotPassword}>Forgot Password</button>}
             {showEmailInput && (
                 <div>
@@ -82,8 +92,15 @@ const Login = () => {
                     <button onClick={handlePasswordReset}>Send OTP</button>
                 </div>
             )}
+            {sendingOTP && <div>Please wait...</div>}
             {error && <div>{error}</div>}
             {successMessage && <div>{successMessage}</div>}
+            {showResetModal && (
+                <ResetModal
+                    onClose={handleResetModalClose}
+                    email={emailForReset}
+                />
+            )}
         </div>
     );
 };

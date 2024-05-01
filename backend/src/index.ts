@@ -113,7 +113,8 @@ app.get("/user-id", verifyUser, (req, res) => {
     res.json({ userId: userId });
 });
 
-// Password Reset Nodemailer and OTP
+
+// Password Reset via Email and OTP
 const OTP_EXPIRATION_TIME = 600;
 
 app.post("/password-reset", async (req, res) => {
@@ -151,8 +152,39 @@ app.post("/password-reset", async (req, res) => {
             from: "Gourmet Gleam <gourmetgleam@demomailtrap.com>",
             to: email,
             subject: "Password Reset OTP",
-            html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p>`,
+            html: `
+                <html>
+                    <head>
+                        <style>
+                            /* Add your CSS styles here */
+                            body {
+                                font-family: Arial, sans-serif;
+                            }
+                            .container {
+                                max-width: 600px;
+                                margin: 0 auto;
+                                padding: 20px;
+                                background-color: #f7f7f7;
+                                border-radius: 10px;
+                            }
+                            .otp {
+                                font-size: 20px;
+                                font-weight: bold;
+                                color: #333;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h2>Password Reset OTP</h2>
+                            <p>Your OTP for password reset is:</p>
+                            <p class="otp">${otp}</p>
+                        </div>
+                    </body>
+                </html>
+            `,
         };
+
         await transporter.sendMail(mailOptions);
 
         return res.json({ message: "OTP sent successfully" });
@@ -163,7 +195,36 @@ app.post("/password-reset", async (req, res) => {
 });
 
 // OTP verification endpoint
-app.post("/password-reset/verify", async (req, res) => {
+app.post("/password-reset/verify-otp", async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        // Retrieve stored OTP from the database
+        const storedOTP = await prismaClient.passwordResetOTP.findFirst({
+            where: {
+                user: { email: email },
+                otp: otp,
+                expiresAt: { gte: new Date() }, // Check if OTP is not expired
+            },
+        });
+
+        if (!storedOTP) {
+            return res
+                .status(400)
+                .json({ error: "Invalid OTP or OTP expired" });
+        }
+
+        // Proceed with OTP verification logic
+
+        return res.json({ message: "OTP verified successfully" });
+    } catch (error) {
+        console.error("Error verifying OTP:", error);
+        return res.status(500).json({ error: "Failed to verify OTP" });
+    }
+});
+
+// Password reset after verification of OTP
+app.post("/password-reset/confirm-password", async (req, res) => {
     const { email, otp, newPassword } = req.body;
 
     try {
@@ -200,6 +261,32 @@ app.post("/password-reset/verify", async (req, res) => {
         return res.status(500).json({ error: "Failed to reset password" });
     }
 });
+
+// Function to delete expired OTPs from the database
+async function deleteExpiredOTP() {
+    try {
+        // Query expired OTPs
+        const expiredOTPs = await prismaClient.passwordResetOTP.findMany({
+            where: {
+                expiresAt: { lt: new Date() }, // Find OTPs that have expired
+            },
+        });
+
+        // Delete expired OTPs from the database
+        await prismaClient.passwordResetOTP.deleteMany({
+            where: {
+                id: { in: expiredOTPs.map((otp) => otp.id) },
+            },
+        });
+
+        console.log(`Deleted ${expiredOTPs.length} expired OTPs.`);
+    } catch (error) {
+        console.error("Error deleting expired OTPs:", error);
+    }
+}
+
+// Background task to delete expired OTPs periodically
+setInterval(deleteExpiredOTP, 15 * 60 * 1000); // Run every 15 mins
 
 // Home page functionality
 app.get("/api/recipes/search", async (req, res) => {
