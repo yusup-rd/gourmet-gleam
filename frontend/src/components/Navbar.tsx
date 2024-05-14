@@ -1,7 +1,7 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { logout } from "../pages/Auth/authApi";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/navbar/logo.svg";
 
 const Navbar = () => {
     const navigate = useNavigate();

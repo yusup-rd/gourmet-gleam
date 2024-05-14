@@ -1,0 +1,129 @@
+body {
+    overflow: hidden;
+}
+.card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    width: 80vw;
+    max-width: 400px;
+    height: 50vh;
+    max-height: 300px;
+}
+.card-container {
+    position: relative;
+}
+.corner-img {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    z-index: -1;
+}
+.top-left {
+    top: -50%;
+    left: -50%;
+}
+.top-right {
+    top: -50%;
+    right: -50%;
+}
+.bottom-left {
+    bottom: -50%;
+    left: -65%;
+}
+.bottom-right {
+    bottom: -50%;
+    right: -65%;
+}
+.title {
+    color: #ffc107;
+    font-weight: 700;
+}
+.btn-login,
+.btn-otp,
+.btn-verify {
+    background-color: #ff5722;
+    color: white;
+    font-weight: 500;
+    width: 120px;
+}
+.btn-reset {
+    background-color: #ff5722;
+    color: white;
+    font-weight: 500;
+}
+.btn-login:hover,
+.btn-otp:hover,
+.btn-verify:hover,
+.btn-reset:hover {
+    background-color: #ca3406;
+}
+.frame-container {
+    background-color: rgba(30, 30, 30, 0.8); 
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 3px;
+    text-align: center;
+}
+.alert-custom {
+    background-color: rgba(255, 77, 80, 0);
+    border: 3px solid #ff4d4f;
+    color: #ff4d4f;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    font-weight: 700;
+}
+.btn-forgotpw {
+    color: #00bcd4;
+    padding: 0;
+    text-decoration: none !important;
+}
+.btn-forgotpw:hover {
+    color: #ff5722;
+}
+a {
+    color: #00bcd4;
+    transition: 0.2s;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: none;
+    color: #ff5722;
+}
+.modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+    width: 500px;
+    background-color: #2e2e2e;
+    padding: 0 20px;
+    border-radius: 10px;
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.modal-header .modal-title {
+    margin: 0;
+    color: #ffc107;
+    font-weight: 700;
+}
+.modal-header .btn-close {
+    color: #ffc107;
+    font-size: 28px;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}

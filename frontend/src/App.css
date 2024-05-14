@@ -1,7 +1,9 @@
 #root {
     font-family: "Poppins", Arial, Helvetica, sans-serif;
 }
-
+body {
+    background-color: #121212;
+}
 .recipe-modal-overlay {
     position: fixed;
     top: 0;
