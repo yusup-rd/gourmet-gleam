@@ -64,6 +64,11 @@ const Login = () => {
             className="container d-flex flex-column justify-content-center align-items-center position-relative"
             style={{ height: "100vh" }}
         >
+            {error && (
+                <div className="error-message-container">
+                    <div className="text-danger">{error}</div>
+                </div>
+            )}
             <div className="card-container position-relative">
                 <div className="card p-4 d-flex flex-column justify-content-center">
                     <h2 className="mb-4 text-center title">Login</h2>
@@ -161,7 +166,7 @@ const Login = () => {
             {sendingOTP && (
                 <div className="text-warning my-3">Please wait...</div>
             )}
-            {error && <div className="text-danger my-3">{error}</div>}
+
             {successMessage && (
                 <div className="text-success my-3">{successMessage}</div>
             )}
