@@ -3,62 +3,79 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:5000/register", {
-        name,
-        email,
-        password,
-      });
-      console.log(response.data);
-      navigate("/login");
-    } catch (error) {
-      setError("Registration failed. Please try again later.");
-    }
-  };
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/register",
+                {
+                    name,
+                    email,
+                    password,
+                }
+            );
+            console.log(response.data);
+            navigate("/login");
+        } catch (error) {
+            setError("Registration failed. Please try again later.");
+        }
+    };
 
-  return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
+    return (
         <div>
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+            <h2>Register</h2>
+            <form onSubmit={handleRegister}>
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="on"
+                    />
+                </div>
+                <div>
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        autoComplete="on"
+                    />
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <Link to="/login">Already have an account</Link>
+            {error && <div>{error}</div>}
         </div>
-        <div>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="on"
-          />
-        </div>
-        <button type="submit">Register</button>
-      </form>
-      <Link to="/login">Already have an account</Link>
-      {error && <div>{error}</div>}
-    </div>
-  );
+    );
 };
 
 export default Register;

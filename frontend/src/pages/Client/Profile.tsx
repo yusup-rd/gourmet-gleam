@@ -1,6 +1,8 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Select from "react-select";
+import { getUserRole } from "../Auth/authApi";
 
 const Profile = () => {
     interface UserData {
@@ -22,6 +24,7 @@ const Profile = () => {
         diet: [],
         intolerances: [],
     });
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [editableName, setEditableName] = useState(false);
     const [editableEmail, setEditableEmail] = useState(false);
@@ -36,6 +39,16 @@ const Profile = () => {
     const [passwordError, setPasswordError] = useState("");
 
     useEffect(() => {
+        const restrict = async () => {
+            const userRoleResponse = await getUserRole();
+            const userRole = userRoleResponse?.role;
+            if (userRole === "admin") {
+                navigate("/admin");
+                return;
+            }
+        };
+        restrict();
+
         const fetchData = async () => {
             try {
                 const response = await fetchUserData();
@@ -225,6 +238,32 @@ const Profile = () => {
         setConfirmNewPassword(event.target.value);
     };
 
+    const handleDeleteAccount = async () => {
+        try {
+            const confirmed = window.confirm(
+                "Are you sure you want to delete your account?"
+            );
+            if (!confirmed) {
+                return;
+            } else {
+                navigate("/register");
+            }
+
+            const response = await fetch(
+                "http://localhost:5000/profile/delete",
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                }
+            );
+            if (!response.ok) {
+                throw new Error("Failed to delete account");
+            }
+        } catch (error: any) {
+            console.error("Error deleting account:", error);
+        }
+    };
+
     // Options for preferences settings
     const cuisineOptions = [
         { value: "african", label: "African" },
@@ -326,96 +365,6 @@ const Profile = () => {
                 <>
                     <h3>Welcome, {userData.name}</h3>
 
-                    <h5>Account Settings</h5>
-                    <div>
-                        {editableName ? (
-                            <>
-                                <input
-                                    type="text"
-                                    value={editedName}
-                                    onChange={handleChangeName}
-                                />
-                                <button onClick={handleSaveName}>
-                                    Save Name
-                                </button>
-                                <button onClick={handleCancelName}>
-                                    Cancel
-                                </button>
-                                {nameError && <p>{nameError}</p>}
-                            </>
-                        ) : (
-                            <>
-                                <p>Name: {userData.name}</p>
-                                <button onClick={handleEditName}>
-                                    Edit Name
-                                </button>
-                            </>
-                        )}
-                    </div>
-
-                    <div>
-                        {editableEmail ? (
-                            <>
-                                <input
-                                    type="email"
-                                    value={editedEmail}
-                                    onChange={handleChangeEmail}
-                                />
-                                <button onClick={handleSaveEmail}>
-                                    Save Email
-                                </button>
-                                <button onClick={handleCancelEmail}>
-                                    Cancel
-                                </button>
-                                {emailError && <p>{emailError}</p>}
-                            </>
-                        ) : (
-                            <>
-                                <p>Email: {userData.email}</p>
-                                <button onClick={handleEditEmail}>
-                                    Edit Email
-                                </button>
-                            </>
-                        )}
-                    </div>
-
-                    <div>
-                        {editablePassword ? (
-                            <form onSubmit={handleSavePassword}>
-                                <input
-                                    type="password"
-                                    placeholder="Current Password"
-                                    value={currentPassword}
-                                    onChange={handleChangeCurrentPassword}
-                                    autoComplete="true"
-                                />
-                                <input
-                                    type="password"
-                                    placeholder="New Password"
-                                    value={newPassword}
-                                    onChange={handleChangeNewPassword}
-                                    autoComplete="true"
-                                />
-                                <input
-                                    type="password"
-                                    placeholder="Confirm New Password"
-                                    value={confirmNewPassword}
-                                    onChange={handleChangeConfirmNewPassword}
-                                    autoComplete="true"
-                                />
-                                <button type="submit">Save Password</button>
-                                <button onClick={handleCancelPassword}>
-                                    Cancel
-                                </button>
-                                {passwordError && <p>{passwordError}</p>}
-                            </form>
-                        ) : (
-                            <button onClick={handleEditPassword}>
-                                Change Password
-                            </button>
-                        )}
-                    </div>
-
                     <h5>Preferences Settings</h5>
                     {userData && (
                         <>
@@ -477,6 +426,110 @@ const Profile = () => {
                                     )}
                                     onChange={handleIntolerancesChange}
                                 />
+                            </div>
+
+                            <h5>Account Settings</h5>
+                            <div>
+                                {editableName ? (
+                                    <>
+                                        <input
+                                            type="text"
+                                            value={editedName}
+                                            onChange={handleChangeName}
+                                        />
+                                        <button onClick={handleSaveName}>
+                                            Save Name
+                                        </button>
+                                        <button onClick={handleCancelName}>
+                                            Cancel
+                                        </button>
+                                        {nameError && <p>{nameError}</p>}
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>Name: {userData.name}</p>
+                                        <button onClick={handleEditName}>
+                                            Edit Name
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+
+                            <div>
+                                {editableEmail ? (
+                                    <>
+                                        <input
+                                            type="email"
+                                            value={editedEmail}
+                                            onChange={handleChangeEmail}
+                                        />
+                                        <button onClick={handleSaveEmail}>
+                                            Save Email
+                                        </button>
+                                        <button onClick={handleCancelEmail}>
+                                            Cancel
+                                        </button>
+                                        {emailError && <p>{emailError}</p>}
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>Email: {userData.email}</p>
+                                        <button onClick={handleEditEmail}>
+                                            Edit Email
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+
+                            <div>
+                                {editablePassword ? (
+                                    <form onSubmit={handleSavePassword}>
+                                        <input
+                                            type="password"
+                                            placeholder="Current Password"
+                                            value={currentPassword}
+                                            onChange={
+                                                handleChangeCurrentPassword
+                                            }
+                                            autoComplete="true"
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder="New Password"
+                                            value={newPassword}
+                                            onChange={handleChangeNewPassword}
+                                            autoComplete="true"
+                                        />
+                                        <input
+                                            type="password"
+                                            placeholder="Confirm New Password"
+                                            value={confirmNewPassword}
+                                            onChange={
+                                                handleChangeConfirmNewPassword
+                                            }
+                                            autoComplete="true"
+                                        />
+                                        <button type="submit">
+                                            Save Password
+                                        </button>
+                                        <button onClick={handleCancelPassword}>
+                                            Cancel
+                                        </button>
+                                        {passwordError && (
+                                            <p>{passwordError}</p>
+                                        )}
+                                    </form>
+                                ) : (
+                                    <button onClick={handleEditPassword}>
+                                        Change Password
+                                    </button>
+                                )}
+                            </div>
+
+                            <div>
+                                <button onClick={handleDeleteAccount}>
+                                    Delete My Account
+                                </button>
                             </div>
                         </>
                     )}

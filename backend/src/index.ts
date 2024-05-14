@@ -121,6 +121,17 @@ app.post("/password-reset", async (req, res) => {
     const { email } = req.body;
 
     try {
+        // Fetch user's name based on the provided email
+        const user = await prismaClient.user.findUnique({
+            where: { email: email },
+            select: { name: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const username = user.name;
         // Generate OTP
         const secret = authenticator.generateSecret();
         const otp = authenticator.generate(secret);
@@ -175,11 +186,12 @@ app.post("/password-reset", async (req, res) => {
                         </style>
                     </head>
                     <body>
-                        <div class="container">
-                            <h2>Password Reset OTP</h2>
-                            <p>Your OTP for password reset is:</p>
-                            <p class="otp">${otp}</p>
-                        </div>
+                    <div class="container">
+                        <h2>Password Reset OTP</h2>
+                        <p>Hi ${username}!</p>
+                        <p>Here is your OTP for password reset:</p>
+                        <p class="otp">${otp}</p>
+                    </div>
                     </body>
                 </html>
             `,
@@ -286,7 +298,7 @@ async function deleteExpiredOTP() {
 }
 
 // Background task to delete expired OTPs periodically
-setInterval(deleteExpiredOTP, 15 * 60 * 1000); // Run every 15 mins
+setInterval(deleteExpiredOTP, 1 * 60 * 1000); // Run every 15 mins
 
 // Home page functionality
 app.get("/api/recipes/search", async (req, res) => {
@@ -554,6 +566,19 @@ app.post("/profile/change-password", verifyUser, async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Failed to update password" });
+    }
+});
+
+app.delete("/profile/delete", verifyUser, async (req, res) => {
+    const userId = req.body.userId;
+    try {
+        await prismaClient.user.delete({
+            where: { id: userId },
+        });
+        res.clearCookie("token");
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to delete user account" });
     }
 });
 

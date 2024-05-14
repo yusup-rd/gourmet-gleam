@@ -6,7 +6,8 @@ import { Recipe } from "../../types";
 import RecipeCard from "../../components/RecipeCard";
 import RecipeModal from "../../components/RecipeModal";
 import * as api from "../../api";
-import { getUserId } from "../Auth/authApi";
+import { getUserId, getUserRole } from "../Auth/authApi";
+import { useNavigate } from "react-router-dom";
 
 interface UserPreferences {
     preferredCuisine: string[];
@@ -28,8 +29,19 @@ const Recommend = () => {
     );
     const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
     const [favouriteRecipeIds, setFavouriteRecipeIds] = useState<number[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
+        const restrict = async () => {
+            const userRoleResponse = await getUserRole();
+            const userRole = userRoleResponse?.role;
+            if (userRole === "admin") {
+                navigate("/admin");
+                return;
+            }
+        };
+        restrict();
+        
         const fetchUserPreferences = async () => {
             try {
                 const response = await axios.get(
@@ -55,8 +67,16 @@ const Recommend = () => {
 
     useEffect(() => {
         if (userPreferences && recipesFetched) {
-            fetchRecipes(userPreferences, page);
-            setRecipesFetched(false);
+            if (
+                userPreferences.preferredCuisine.length > 0 ||
+                userPreferences.excludedCuisine.length > 0 ||
+                userPreferences.diet.length > 0 ||
+                userPreferences.intolerances.length > 0
+            ) {
+                fetchRecipes(userPreferences, page);
+            } else {
+                setRecipesFetched(false);
+            }
         }
     }, [userPreferences, recipesFetched, page]);
 
@@ -114,10 +134,14 @@ const Recommend = () => {
             if (response.data.results.length === 0) {
                 setMoreRecipesAvailable(false);
             } else {
-                setRecipes((prevRecipes) => [
-                    ...prevRecipes,
-                    ...response.data.results,
-                ]);
+                if (page === 1) {
+                    setRecipes(response.data.results);
+                } else {
+                    setRecipes((prevRecipes) => [
+                        ...prevRecipes,
+                        ...response.data.results,
+                    ]);
+                }
             }
         } catch (error) {
             console.error("Error fetching recipes:", error);
@@ -309,50 +333,46 @@ const Recommend = () => {
                             Go to <Link to="/profile">Profile Page</Link> to
                             edit preferences.
                         </p>
-                        {recipes.length > 0 && (
-                            <div>
-                                <h2>Recommended Recipes</h2>
-                                <ul>
-                                    {recipes.map((recipe, index) => {
-                                        const isFavourite =
-                                            favouriteRecipeIds.includes(
-                                                recipe.id
-                                            );
-                                        const uniqueKey = `${recipe.id}-${index}`;
-                                        return (
-                                            <li key={uniqueKey}>
-                                                <RecipeCard
-                                                    recipe={recipe}
-                                                    onClick={() =>
-                                                        setSelectedRecipe(
-                                                            recipe
-                                                        )
-                                                    }
-                                                    onFavouriteButtonClick={() =>
-                                                        toggleFavourite(
-                                                            recipe.id
-                                                        )
-                                                    }
-                                                    isFavourite={isFavourite}
-                                                    searchType="name"
-                                                    selectedTab="search"
-                                                />
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                                {moreRecipesAvailable ? (
-                                    <button onClick={handleViewMoreClick}>
-                                        View More
-                                    </button>
-                                ) : (
-                                    <p>That's all recommendations available.</p>
-                                )}
-                            </div>
-                        )}
                     </div>
                 ) : (
                     <p>Loading...</p>
+                )}
+
+                {userPreferences && recipes.length > 0 && (
+                    <div>
+                        <h2>Recommended Recipes</h2>
+                        <ul>
+                            {recipes.map((recipe, index) => {
+                                const isFavourite = favouriteRecipeIds.includes(
+                                    recipe.id
+                                );
+                                const uniqueKey = `${recipe.id}-${index}`;
+                                return (
+                                    <li key={uniqueKey}>
+                                        <RecipeCard
+                                            recipe={recipe}
+                                            onClick={() =>
+                                                setSelectedRecipe(recipe)
+                                            }
+                                            onFavouriteButtonClick={() =>
+                                                toggleFavourite(recipe.id)
+                                            }
+                                            isFavourite={isFavourite}
+                                            searchType="name"
+                                            selectedTab="search"
+                                        />
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        {moreRecipesAvailable ? (
+                            <button onClick={handleViewMoreClick}>
+                                View More
+                            </button>
+                        ) : (
+                            <p>That's all recommendations available.</p>
+                        )}
+                    </div>
                 )}
             </div>
             {selectedRecipe && (

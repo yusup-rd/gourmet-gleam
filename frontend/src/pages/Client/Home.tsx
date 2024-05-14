@@ -42,11 +42,10 @@ const Home = () => {
                     navigate("/admin");
                     return;
                 } else {
-                    if (selectedTab === "favourites") {
-                        const favouriteRecipesResponse =
-                            await api.getFavouriteRecipes();
-                        setFavouriteRecipes(favouriteRecipesResponse.results);
-                    }
+                    const favouriteRecipesResponse =
+                        await api.getFavouriteRecipes();
+                    setFavouriteRecipes(favouriteRecipesResponse.results);
+
                     if (
                         (searchClickedByName && searchType === "name") ||
                         (searchClickedByIngredients &&
@@ -93,7 +92,6 @@ const Home = () => {
         };
         fetchData();
     }, [
-        selectedTab,
         searchClickedByName,
         searchClickedByIngredients,
         searchType,
