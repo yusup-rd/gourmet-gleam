@@ -33,11 +33,6 @@ export const searchRecipesByIngredients = async (ingredients: string[], page: nu
     }
 };
 
-
-
-
-
-
 export const getRecipeSummary = async (recipeId: string) => {
     const url = new URL(
         `http://localhost:5000/api/recipes/${recipeId}/summary`

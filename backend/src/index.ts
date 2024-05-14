@@ -216,7 +216,7 @@ app.post("/password-reset/verify-otp", async (req, res) => {
             where: {
                 user: { email: email },
                 otp: otp,
-                expiresAt: { gte: new Date() }, // Check if OTP is not expired
+                expiresAt: { gte: new Date() },
             },
         });
 
@@ -225,9 +225,6 @@ app.post("/password-reset/verify-otp", async (req, res) => {
                 .status(400)
                 .json({ error: "Invalid OTP or OTP expired" });
         }
-
-        // Proceed with OTP verification logic
-
         return res.json({ message: "OTP verified successfully" });
     } catch (error) {
         console.error("Error verifying OTP:", error);
@@ -245,7 +242,7 @@ app.post("/password-reset/confirm-password", async (req, res) => {
             where: {
                 user: { email: email },
                 otp: otp,
-                expiresAt: { gte: new Date() }, // Check if OTP is not expired
+                expiresAt: { gte: new Date() },
             },
         });
 
@@ -280,7 +277,7 @@ async function deleteExpiredOTP() {
         // Query expired OTPs
         const expiredOTPs = await prismaClient.passwordResetOTP.findMany({
             where: {
-                expiresAt: { lt: new Date() }, // Find OTPs that have expired
+                expiresAt: { lt: new Date() },
             },
         });
 
@@ -290,15 +287,13 @@ async function deleteExpiredOTP() {
                 id: { in: expiredOTPs.map((otp) => otp.id) },
             },
         });
-
-        console.log(`Deleted ${expiredOTPs.length} expired OTPs.`);
     } catch (error) {
         console.error("Error deleting expired OTPs:", error);
     }
 }
 
 // Background task to delete expired OTPs periodically
-setInterval(deleteExpiredOTP, 1 * 60 * 1000); // Run every 15 mins
+setInterval(deleteExpiredOTP, 1 * 60 * 1000);
 
 // Home page functionality
 app.get("/api/recipes/search", async (req, res) => {
@@ -308,6 +303,7 @@ app.get("/api/recipes/search", async (req, res) => {
 
     return res.json(results);
 });
+
 app.get("/api/recipes/findByIngredients", async (req, res) => {
     const ingredients = Array.isArray(req.query.ingredients)
         ? (req.query.ingredients as string[])

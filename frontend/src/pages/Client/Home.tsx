@@ -45,7 +45,6 @@ const Home = () => {
                     const favouriteRecipesResponse =
                         await api.getFavouriteRecipes();
                     setFavouriteRecipes(favouriteRecipesResponse.results);
-
                     if (
                         (searchClickedByName && searchType === "name") ||
                         (searchClickedByIngredients &&
@@ -92,6 +91,7 @@ const Home = () => {
         };
         fetchData();
     }, [
+        selectedTab,
         searchClickedByName,
         searchClickedByIngredients,
         searchType,
@@ -315,17 +315,21 @@ const Home = () => {
             )}
             {selectedTab === "favourites" && (
                 <>
-                    {favouriteRecipes.map((recipe) => (
-                        <RecipeCard
-                            key={recipe.id}
-                            recipe={recipe}
-                            onClick={() => setSelectedRecipe(recipe)}
-                            onFavouriteButtonClick={removeFavouriteRecipe}
-                            isFavourite={true}
-                            searchType={searchType}
-                            selectedTab={selectedTab}
-                        />
-                    ))}
+                    {favouriteRecipes.length > 0 ? (
+                        favouriteRecipes.map((recipe) => (
+                            <RecipeCard
+                                key={recipe.id}
+                                recipe={recipe}
+                                onClick={() => setSelectedRecipe(recipe)}
+                                onFavouriteButtonClick={removeFavouriteRecipe}
+                                isFavourite={true}
+                                searchType={searchType}
+                                selectedTab={selectedTab}
+                            />
+                        ))
+                    ) : (
+                        <p>No recipes here</p>
+                    )}
                 </>
             )}
             {selectedRecipe && (
