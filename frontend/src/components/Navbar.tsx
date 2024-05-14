@@ -1,9 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
-import { RxAvatar } from "react-icons/rx";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { FiMenu } from "react-icons/fi";
 import { logout } from "../pages/Auth/authApi";
+import Logo from "../assets/logo.svg";
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const isActive = (path: string) => {
+        return location.pathname === path;
+    };
 
     const handleLogout = async () => {
         try {
@@ -15,10 +21,10 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <Link to="/" className="navbar-brand">
-                Gourmet Gleam
-            </Link>
+        <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#1E1E1E'}}>
+            <NavLink to="/" className="navbar-brand">
+                <img src={Logo} alt="Gourmet Gleam Logo" height="50" />
+            </NavLink>
             <button
                 className="navbar-toggler"
                 type="button"
@@ -28,31 +34,36 @@ const Navbar = () => {
                 aria-expanded="false"
                 aria-label="Toggle navigation"
             >
-                <RxAvatar />
+                <FiMenu />
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <Link to="/" className="dropdown-item">
+                        <NavLink to="/" className={`dropdown-item ${isActive("/") ? "active" : ""}`}>
                             Home
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link to="/recommendations" className="dropdown-item">
+                        <NavLink to="/recommendations" className={`dropdown-item ${isActive("/recommendations") ? "active" : ""}`}>
                             Recommendations
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link to="/profile" className="dropdown-item">
+                        <NavLink to="/profile" className={`dropdown-item ${isActive("/profile") ? "active" : ""}`}>
                             My Profile
-                        </Link>
+                        </NavLink>
                     </li>
-                    <li className="nav-item">
-                        <span className="dropdown-item" onClick={handleLogout}>
+                    <li className="nav-item d-lg-none"> 
+                        <span className="dropdown-item" onClick={handleLogout} style={{backgroundColor: '#FF4D4F', cursor: 'pointer', margin: '10px 0px'}}>
                             Logout
                         </span>
                     </li>
                 </ul>
+            </div>
+            <div className="navbar-nav ml-auto d-none d-lg-block"> 
+                <span className="nav-item dropdown-item" onClick={handleLogout} style={{backgroundColor: '#FF4D4F', cursor: 'pointer'}}>
+                    Logout
+                </span>
             </div>
         </nav>
     );

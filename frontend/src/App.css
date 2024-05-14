@@ -68,21 +68,18 @@
 }
 
 .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 30px;
-    background-color: greenyellow;
+    padding: 5px 30px;
 }
-
-.avatar-container {
-    display: flex;
-    flex-direction: row-reverse;
+.dropdown-item{
+    color: white;
+    border-radius: 5px;
 }
-
-.dropdown-content {
-    background-color: gray;
+.dropdown-item:hover{
+    transition: 0.2s;
+    background-color: #333333 !important;
+    color: white;
 }
-.dropdown-btn {
-    padding: 20px;
+.active {
+    background-color: transparent !important;
+    color: orange !important;
 }
