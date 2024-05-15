@@ -1,0 +1,36 @@
+.sort-button {
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.sort-button:hover {
+    background-color: #555;
+}
+
+.chevron {
+    margin-left: 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.btn svg {
+    font-size: 20px;
+}
+
+.btn-primary {
+    background-color: #2196f3;
+    color: #fff;
+    border-color: #2196f3;
+}
+
+.btn-danger {
+    background-color: #ff4d4f;
+    color: #fff;
+    border-color: #ff4d4f;
+}

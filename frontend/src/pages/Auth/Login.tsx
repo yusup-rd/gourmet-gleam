@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import axios from "axios";
 import ResetModal from "../../components/ResetModal";
 import cookiesSvg from "../../assets/bg/cookies.svg";
 import pancakesSvg from "../../assets/bg/pancakes.svg";
 import burgerSvg from "../../assets/bg/burger.svg";
 import wrapSvg from "../../assets/bg/wrap.svg";
+import "./auth.css";
+
+const StyledContainer = styled.div`
+    height: 100vh;
+    overflow: hidden;
+`;
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -59,11 +66,16 @@ const Login = () => {
         setSuccessMessage("");
     };
 
+    const handleInputChange = (
+        setter: React.Dispatch<React.SetStateAction<string>>,
+        value: string
+    ) => {
+        setter(value);
+        if (error) setError("");
+    };
+
     return (
-        <div
-            className="container d-flex flex-column justify-content-center align-items-center position-relative"
-            style={{ height: "100vh" }}
-        >
+        <StyledContainer className="d-flex flex-column justify-content-center align-items-center position-relative">
             {error && (
                 <div className="error-message-container">
                     <div className="text-danger">{error}</div>
@@ -79,7 +91,9 @@ const Login = () => {
                                 className="form-control"
                                 placeholder="Email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) =>
+                                    handleInputChange(setEmail, e.target.value)
+                                }
                                 autoComplete="on"
                             />
                         </div>
@@ -89,7 +103,12 @@ const Login = () => {
                                 className="form-control"
                                 placeholder="Password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        setPassword,
+                                        e.target.value
+                                    )
+                                }
                                 autoComplete="on"
                             />
                         </div>
@@ -148,7 +167,12 @@ const Login = () => {
                             className="form-control mb-3"
                             placeholder="Email for Password Reset"
                             value={emailForReset}
-                            onChange={(e) => setEmailForReset(e.target.value)}
+                            onChange={(e) =>
+                                handleInputChange(
+                                    setEmailForReset,
+                                    e.target.value
+                                )
+                            }
                             autoComplete="on"
                             style={{ maxWidth: "100%" }}
                         />
@@ -176,7 +200,7 @@ const Login = () => {
                     email={emailForReset}
                 />
             )}
-        </div>
+        </StyledContainer>
     );
 };
 

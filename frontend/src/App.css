@@ -1,9 +1,30 @@
 #root {
     font-family: "Poppins", Arial, Helvetica, sans-serif;
 }
+
 body {
     background-color: #121212;
+    color: white;
+    scroll-behavior: smooth;
 }
+
+body::-webkit-scrollbar {
+    width: 10px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #121212;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #3d3d3d;
+    border-radius: 5px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 .recipe-modal-overlay {
     position: fixed;
     top: 0;
@@ -21,7 +42,7 @@ body {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    width: 500px; /* Set a fixed width for the modal content */
+    width: 500px;
     max-height: 80%;
     overflow-y: auto;
 }
@@ -72,15 +93,18 @@ body {
 .navbar {
     padding: 5px 30px;
 }
-.dropdown-item{
+
+.dropdown-item {
     color: white;
     border-radius: 5px;
 }
-.dropdown-item:hover{
+
+.dropdown-item:hover {
     transition: 0.2s;
     background-color: #333333 !important;
     color: white;
 }
+
 .active {
     background-color: transparent !important;
     color: orange !important;

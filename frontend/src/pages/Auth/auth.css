@@ -1,69 +1,81 @@
-body {
-    overflow: hidden;
-}
 .card {
     background-color: #1e1e1e;
     border-radius: 10px;
     width: 80vw;
     max-width: 400px;
-    height: 50vh;
-    max-height: 300px;
+    padding: 20px;
+    height: auto;
 }
+
 .card-container {
     position: relative;
 }
+
 .corner-img {
     position: absolute;
     width: 300px;
     height: 300px;
     z-index: -1;
 }
+
 .top-left {
     top: -50%;
     left: -50%;
 }
+
 .top-right {
     top: -50%;
     right: -50%;
 }
+
 .bottom-left {
     bottom: -50%;
     left: -65%;
 }
+
 .bottom-right {
     bottom: -50%;
     right: -65%;
 }
+
 .title {
     color: #ffc107;
     font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
+
 .btn-login,
 .btn-otp,
 .btn-verify {
     background-color: #ff5722;
     color: white;
     font-weight: 500;
-    width: 120px;
+    width: 100%;
+    padding: 10px;
 }
+
 .btn-reset {
     background-color: #ff5722;
     color: white;
     font-weight: 500;
 }
+
 .btn-login:hover,
 .btn-otp:hover,
 .btn-verify:hover,
 .btn-reset:hover {
     background-color: #ca3406;
 }
+
 .frame-container {
-    background-color: rgba(30, 30, 30, 0.8); 
+    background-color: rgba(30, 30, 30, 0.8);
     border-radius: 10px;
     padding: 10px;
     margin-top: 3px;
     text-align: center;
 }
+
 .alert-custom {
     background-color: rgba(255, 77, 80, 0);
     border: 3px solid #ff4d4f;
@@ -73,36 +85,49 @@ body {
     border-radius: 10px;
     font-weight: 700;
 }
+
 .btn-forgotpw {
     color: #00bcd4;
     padding: 0;
     text-decoration: none !important;
 }
+
 .btn-forgotpw:hover {
     color: #ff5722;
 }
+
 a {
     color: #00bcd4;
     transition: 0.2s;
     text-decoration: none;
 }
+
 a:hover {
     text-decoration: none;
     color: #ff5722;
 }
+
 .error-message-container {
-    width: 40vw;
-    border: 3px solid #FF4D4F;
+    width: 50%;
+    background-color: #ff4d5014;
+    border: 3px solid #ff4d4f;
     border-radius: 10px;
     padding: 10px;
-    margin: 20px auto; 
+    margin: 20px auto;
     text-align: center;
 }
 
+@media (min-width: 992px) {
+    .error-message-container {
+        width: 30%;
+    }
+}
+
 .error-message-container .text-danger {
-    color: #FF4D4F;
+    color: #ff4d4f;
     font-weight: 700;
 }
+
 .modal-wrapper {
     position: fixed;
     top: 0;
@@ -114,23 +139,27 @@ a:hover {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.5);
 }
+
 .modal-content {
     width: 500px;
     background-color: #2e2e2e;
     padding: 0 20px;
     border-radius: 10px;
 }
+
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
+
 .modal-header .modal-title {
     margin: 0;
     color: #ffc107;
     font-weight: 700;
 }
+
 .modal-header .btn-close {
     color: #ffc107;
     font-size: 28px;

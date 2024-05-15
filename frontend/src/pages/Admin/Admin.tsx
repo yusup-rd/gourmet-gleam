@@ -5,6 +5,7 @@ import { User } from "../../types";
 import { FaUserEdit } from "react-icons/fa";
 import { MdDeleteForever } from "react-icons/md";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import "./admin.css";
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -49,9 +50,13 @@ const Admin = () => {
                     if (sortBy === "id") {
                         return sortOrder === "asc" ? a.id - b.id : b.id - a.id;
                     } else if (sortBy === "name") {
-                        return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+                        return sortOrder === "asc"
+                            ? a.name.localeCompare(b.name)
+                            : b.name.localeCompare(a.name);
                     } else {
-                        return sortOrder === "asc" ? a.email.localeCompare(b.email) : b.email.localeCompare(a.email);
+                        return sortOrder === "asc"
+                            ? a.email.localeCompare(b.email)
+                            : b.email.localeCompare(a.email);
                     }
                 });
                 setUsers(sortedUsers);
@@ -87,7 +92,6 @@ const Admin = () => {
 
     const handleSave = async (userId: number) => {
         try {
-            // Perform the PUT request to update user data
             const response = await fetch(
                 `http://localhost:5000/admin/users/${userId}`,
                 {
@@ -106,7 +110,6 @@ const Admin = () => {
                 throw new Error("Failed to save user data");
             }
 
-            // If the save is successful, update local state with edited values
             setUsers((prevUsers) =>
                 prevUsers.map((user) => {
                     if (user.id === userId) {
@@ -120,7 +123,6 @@ const Admin = () => {
                 })
             );
 
-            // Reset editable state
             setEditableUserId(null);
         } catch (error) {
             console.error("Error saving user data:", error);
@@ -128,10 +130,11 @@ const Admin = () => {
     };
 
     const handleDelete = async (userId: number, userName: string) => {
-        const confirmation = window.confirm(`Are you sure you want to delete user "${userName}"?`);
+        const confirmation = window.confirm(
+            `Are you sure you want to delete user "${userName}"?`
+        );
         if (confirmation) {
             try {
-                // Perform the DELETE request to delete the user
                 const response = await fetch(
                     `http://localhost:5000/admin/users/${userId}`,
                     {
@@ -143,8 +146,9 @@ const Admin = () => {
                     throw new Error("Failed to delete user");
                 }
 
-                // If deletion is successful, update local state by removing the deleted user
-                setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+                setUsers((prevUsers) =>
+                    prevUsers.filter((user) => user.id !== userId)
+                );
             } catch (error) {
                 console.error("Error deleting user:", error);
             }
@@ -169,61 +173,134 @@ const Admin = () => {
     };
 
     return (
-        <div>
-            <h1>Admin Page</h1>
-            <button onClick={handleLogout}>Logout</button>
-            <br />
-            <input
-                type="text"
-                placeholder="Search by name or email"
-                value={searchQuery}
-                onChange={handleSearch}
-            />
-            <p>Sort:</p>
-            <span onClick={() => handleSort("id")}>
-                By ID {sortBy === "id" && (sortOrder === "asc" ? <FaChevronUp /> : <FaChevronDown />)}
+        <div className="container mt-5">
+            <div className="d-flex justify-content-between align-items-center">
+                <h1 className="mb-4">Admin Page</h1>
+                <button className="btn btn-danger mb-3" onClick={handleLogout}>
+                    Logout
+                </button>
+            </div>
+            <div className="mb-3">
+                <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search by name or email"
+                    value={searchQuery}
+                    onChange={handleSearch}
+                />
+            </div>
+            <p>Sort By:</p>
+            <span className="mr-3 sort-button" onClick={() => handleSort("id")}>
+                <span>ID</span>
+                {sortBy === "id" &&
+                    (sortOrder === "asc" ? (
+                        <FaChevronUp className="chevron" />
+                    ) : (
+                        <FaChevronDown className="chevron" />
+                    ))}
             </span>
-            <span onClick={() => handleSort("name")}>
-                By Name {sortBy === "name" && (sortOrder === "asc" ? <FaChevronUp /> : <FaChevronDown />)}
+            <span
+                className="mr-3 sort-button"
+                onClick={() => handleSort("name")}
+            >
+                <span>Name</span>
+                {sortBy === "name" &&
+                    (sortOrder === "asc" ? (
+                        <FaChevronUp className="chevron" />
+                    ) : (
+                        <FaChevronDown className="chevron" />
+                    ))}
             </span>
-            <span onClick={() => handleSort("email")}>
-                By Email {sortBy === "email" && (sortOrder === "asc" ? <FaChevronUp /> : <FaChevronDown />)}
+            <span
+                className="mr-3 sort-button"
+                onClick={() => handleSort("email")}
+            >
+                <span>Email</span>
+                {sortBy === "email" &&
+                    (sortOrder === "asc" ? (
+                        <FaChevronUp className="chevron" />
+                    ) : (
+                        <FaChevronDown className="chevron" />
+                    ))}
             </span>
-            <h2>List of Registered Users</h2>
-            <ul>
+            <h2 className="my-4">List of Registered Users</h2>
+            <ul className="list-group my-4">
                 {users.map((user) => (
-                    <li key={user.id}>
-                        <p>ID: {user.id}</p>
-                        {editableUserId === user.id ? (
-                            <>
-                                <input
-                                    type="text"
-                                    value={editedName}
-                                    onChange={handleChangeName}
-                                />
-                                <input
-                                    type="email"
-                                    value={editedEmail}
-                                    onChange
-                                    ={handleChangeEmail}
+                    <li
+                        key={user.id}
+                        className="list-group-item my-1 d-flex justify-content-between align-items-center"
+                        style={{
+                            backgroundColor: "#333333",
+                            borderRadius: "10px",
+                        }}
+                    >
+                        <div>
+                            <p>ID: {user.id}</p>
+                            {editableUserId === user.id ? (
+                                <div className="input-group mb-3">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={editedName}
+                                        onChange={handleChangeName}
                                     />
-                                    <button onClick={() => handleSave(user.id)}>Save</button>
-                                    <button onClick={handleCancelEdit}>Cancel</button>
-                                </>
+                                    <input
+                                        type="email"
+                                        className="form-control rounded-right"
+                                        value={editedEmail}
+                                        onChange={handleChangeEmail}
+                                    />
+                                    <div className="input-group-append">
+                                        <button
+                                            className="btn btn-success ml-2 rounded-left"
+                                            onClick={() => handleSave(user.id)}
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            className="btn btn-secondary"
+                                            onClick={handleCancelEdit}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             ) : (
                                 <>
                                     <p>Name: {user.name}</p>
                                     <p>Email: {user.email}</p>
-                                    <FaUserEdit onClick={() => handleEdit(user.id)} />
-                                    <MdDeleteForever onClick={() => handleDelete(user.id, user.name)} />
                                 </>
                             )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-    };
-    
-    export default Admin;
-    
+                        </div>
+                        {!editableUserId && (
+                            <div
+                                className="d-flex flex-column"
+                            >
+                                <button
+                                    className="btn btn-primary text-left d-flex align-items-center justify-content-between rounded my-1"
+                                    style={{ width: "200px", height:"45px" }}
+                                    onClick={() => handleEdit(user.id)}
+                                >
+                                    <span>Edit</span>
+                                    <FaUserEdit />
+                                </button>
+                                <button
+                                    className="btn btn-danger text-left d-flex align-items-center justify-content-between rounded my-1"
+                                    style={{ width: "200px", height:"45px" }}
+                                    onClick={() =>
+                                        handleDelete(user.id, user.name)
+                                    }
+                                >
+                                    <span>Delete</span>
+                                    <MdDeleteForever />
+                                </button>
+                            </div>
+                        )}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+export default Admin;
