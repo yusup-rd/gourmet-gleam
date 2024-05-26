@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Select from "react-select";
 import { getUserRole } from "../Auth/authApi";
+import "./profile.css";
 
 const Profile = () => {
     interface UserData {
@@ -354,22 +355,84 @@ const Profile = () => {
         });
     };
 
+    const customStyles = {
+        control: (provided: any) => ({
+            ...provided,
+            backgroundColor: "#1a1a1a",
+            borderColor: "#6c757d",
+            borderRadius: "8px",
+            minHeight: "40px",
+        }),
+        menu: (provided: any) => ({
+            ...provided,
+            backgroundColor: "#1a1a1a", // Dark background color
+            color: "#fff", // White text color
+        }),
+        menuList: (provided: any) => ({
+            ...provided,
+
+            "::-webkit-scrollbar": {
+                width: "4px",
+                height: "0px",
+            },
+            "::-webkit-scrollbar-track": {
+                background: "#1a1a1a",
+            },
+            "::-webkit-scrollbar-thumb": {
+                background: "#ffc107",
+                borderRadius: "5px",
+            },
+            "::-webkit-scrollbar-thumb:hover": {
+                background: "#555",
+            },
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: state.isSelected ? "#000000" : null,
+            color: "#fff",
+            "&:hover": {
+                backgroundColor: "#ffc10750",
+            },
+        }),
+        multiValueLabel: (provided: any) => ({
+            ...provided,
+            color: "#f5f5f5",
+        }),
+        multiValue: (provided: any) => ({
+            ...provided,
+            backgroundColor: "#333333",
+            borderRadius: '4px',
+        }),
+        multiValueRemove: (provided: any) => ({
+            ...provided,
+            color: "white",
+            backgroundColor: "#6c757d",
+            borderRadius: "4px",
+            ":hover": {
+                backgroundColor: "#dc3545",
+                color: "white",
+            },
+        }),
+    };
+
     return (
         <>
             <Navbar />
-            <h1>Profile Page</h1>
-
             {isLoading ? (
                 <p>Loading...</p>
             ) : (
                 <>
-                    <h3>Welcome, {userData.name}</h3>
-
-                    <h5>Preferences Settings</h5>
-                    {userData && (
-                        <>
+                    <div className="container flex-column align-items-start">
+                        <h1 className="mt-5 profile-title">Profile Page</h1>
+                        <h3 className="profile-subtitle">
+                            Welcome, {userData.name}
+                        </h3>
+                    </div>
+                    <div className="container mb-5 d-flex align-items-center justify-content-between">
+                        <div className="card mt-5 mx-3">
+                            <h5 className="title">Preferences Settings</h5>
                             <div>
-                                <p>Preferred cuisine</p>
+                                <p className="mb-2">Preferred cuisine</p>
                                 <Select
                                     isMulti
                                     options={cuisineOptions}
@@ -379,12 +442,13 @@ const Profile = () => {
                                         value: cuisine,
                                         label: cuisine,
                                     }))}
+                                    styles={customStyles}
                                     onChange={handlePreferredCuisineChange}
                                 />
                             </div>
 
                             <div>
-                                <p>Exclude cuisine</p>
+                                <p className="mt-3 mb-2">Exclude cuisine</p>
                                 <Select
                                     isMulti
                                     options={cuisineOptions}
@@ -394,12 +458,13 @@ const Profile = () => {
                                             label: cuisine,
                                         })
                                     )}
+                                    styles={customStyles}
                                     onChange={handleExcludedCuisineChange}
                                 />
                             </div>
 
                             <div>
-                                <p>Diet</p>
+                                <p className="mt-3 mb-2">Diet</p>
                                 <Select
                                     isMulti
                                     options={dietOptions}
@@ -409,12 +474,13 @@ const Profile = () => {
                                             label: diet,
                                         })
                                     )}
+                                    styles={customStyles}
                                     onChange={handleDietChange}
                                 />
                             </div>
 
                             <div>
-                                <p>Intolerances</p>
+                                <p className="mt-3 mb-2">Intolerances</p>
                                 <Select
                                     isMulti
                                     options={intolerancesOptions}
@@ -424,68 +490,123 @@ const Profile = () => {
                                             label: intolerance,
                                         })
                                     )}
+                                    styles={customStyles}
                                     onChange={handleIntolerancesChange}
                                 />
                             </div>
+                        </div>
 
-                            <h5>Account Settings</h5>
-                            <div>
+                        <div className="card mt-5 mx-3 p-3">
+                            <h5 className="title">Account Settings</h5>
+                            <div className="mb-3">
                                 {editableName ? (
-                                    <>
+                                    <div className="d-flex flex-column">
                                         <input
                                             type="text"
+                                            className="form-control mb-2"
                                             value={editedName}
                                             onChange={handleChangeName}
                                         />
-                                        <button onClick={handleSaveName}>
-                                            Save Name
-                                        </button>
-                                        <button onClick={handleCancelName}>
-                                            Cancel
-                                        </button>
-                                        {nameError && <p>{nameError}</p>}
-                                    </>
+                                        <div className="btn-group d-flex justify-content-center">
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={handleSaveName}
+                                            >
+                                                Save Name
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary"
+                                                onClick={handleCancelName}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        {nameError && (
+                                            <p className="text-danger mt-2">
+                                                {nameError}
+                                            </p>
+                                        )}
+                                    </div>
                                 ) : (
-                                    <>
-                                        <p>Name: {userData.name}</p>
-                                        <button onClick={handleEditName}>
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <p className="mb-0">
+                                            Name:{" "}
+                                            {userData.name.length > 15
+                                                ? userData.name.substring(
+                                                      0,
+                                                      15
+                                                  ) + "..."
+                                                : userData.name}
+                                        </p>
+                                        <button
+                                            className="btn btn-outline-primary"
+                                            onClick={handleEditName}
+                                        >
                                             Edit Name
                                         </button>
-                                    </>
+                                    </div>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="mb-3">
                                 {editableEmail ? (
-                                    <>
+                                    <div className="d-flex flex-column">
                                         <input
                                             type="email"
+                                            className="form-control mb-2"
                                             value={editedEmail}
                                             onChange={handleChangeEmail}
                                         />
-                                        <button onClick={handleSaveEmail}>
-                                            Save Email
-                                        </button>
-                                        <button onClick={handleCancelEmail}>
-                                            Cancel
-                                        </button>
-                                        {emailError && <p>{emailError}</p>}
-                                    </>
+                                        <div className="btn-group d-flex justify-content-center">
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={handleSaveEmail}
+                                            >
+                                                Save Email
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary"
+                                                onClick={handleCancelEmail}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        {emailError && (
+                                            <p className="text-danger mt-2">
+                                                {emailError}
+                                            </p>
+                                        )}
+                                    </div>
                                 ) : (
-                                    <>
-                                        <p>Email: {userData.email}</p>
-                                        <button onClick={handleEditEmail}>
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <p className="mb-0">
+                                            Email:{" "}
+                                            {userData.email.length > 15
+                                                ? userData.email.substring(
+                                                      0,
+                                                      15
+                                                  ) + "..."
+                                                : userData.email}
+                                        </p>
+                                        <button
+                                            className="btn btn-outline-primary"
+                                            onClick={handleEditEmail}
+                                        >
                                             Edit Email
                                         </button>
-                                    </>
+                                    </div>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="mb-3">
                                 {editablePassword ? (
-                                    <form onSubmit={handleSavePassword}>
+                                    <form
+                                        onSubmit={handleSavePassword}
+                                        className="d-flex flex-column"
+                                    >
                                         <input
                                             type="password"
+                                            className="form-control mb-2"
                                             placeholder="Current Password"
                                             value={currentPassword}
                                             onChange={
@@ -495,6 +616,7 @@ const Profile = () => {
                                         />
                                         <input
                                             type="password"
+                                            className="form-control mb-2"
                                             placeholder="New Password"
                                             value={newPassword}
                                             onChange={handleChangeNewPassword}
@@ -502,6 +624,7 @@ const Profile = () => {
                                         />
                                         <input
                                             type="password"
+                                            className="form-control mb-2"
                                             placeholder="Confirm New Password"
                                             value={confirmNewPassword}
                                             onChange={
@@ -509,30 +632,49 @@ const Profile = () => {
                                             }
                                             autoComplete="true"
                                         />
-                                        <button type="submit">
-                                            Save Password
-                                        </button>
-                                        <button onClick={handleCancelPassword}>
-                                            Cancel
-                                        </button>
+                                        <div className="btn-group d-flex justify-content-center">
+                                            <button
+                                                type="submit"
+                                                className="btn btn-primary"
+                                            >
+                                                Save Password
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="btn btn-secondary"
+                                                onClick={handleCancelPassword}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                         {passwordError && (
-                                            <p>{passwordError}</p>
+                                            <p className="text-danger mt-2">
+                                                {passwordError}
+                                            </p>
                                         )}
                                     </form>
                                 ) : (
-                                    <button onClick={handleEditPassword}>
-                                        Change Password
-                                    </button>
+                                    <div className="d-flex justify-content-center">
+                                        <button
+                                            className="btn btn-outline-primary"
+                                            onClick={handleEditPassword}
+                                        >
+                                            Change Password
+                                        </button>
+                                    </div>
                                 )}
                             </div>
 
-                            <div>
-                                <button onClick={handleDeleteAccount}>
+                            <div className="d-flex justify-content-center">
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={handleDeleteAccount}
+                                >
                                     Delete My Account
                                 </button>
                             </div>
-                        </>
-                    )}
+                        </div>
+                    </div>
                 </>
             )}
         </>
