@@ -5,6 +5,7 @@ import { Recipe } from "../../types";
 import RecipeCard from "../../components/RecipeCard";
 import RecipeModal from "../../components/RecipeModal";
 import Navbar from "../../components/Navbar";
+import HomeText from "../../components/HomeText";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated, getUserId, getUserRole } from "../Auth/authApi";
 
@@ -234,111 +235,160 @@ const Home = () => {
     return (
         <div>
             <Navbar />
-            <div className="tabs">
-                <h1 onClick={() => setSelectedTab("search")}>Recipe Search</h1>
-                <h1 onClick={() => setSelectedTab("favourites")}>Favourites</h1>
-            </div>
-            {selectedTab === "search" && (
-                <>
-                    <form onSubmit={(event) => handleSearchSubmit(event)}>
-                        {searchType === "name" && (
-                            <input
-                                type="text"
-                                required
-                                placeholder="Enter a recipe name"
-                                value={searchTerm}
-                                onChange={(event) =>
-                                    setSearchTerm(event.target.value)
-                                }
-                            />
-                        )}
-                        {searchType === "ingredients" && (
-                            <input
-                                type="text"
-                                required
-                                placeholder="Enter ingredients"
-                                value={searchIngredient}
-                                onChange={handleIngredientChange}
-                            />
-                        )}
-                        <button type="submit">Submit</button>
-                    </form>
-                    <div>
-                        <select
-                            value={searchType}
-                            onChange={(event) =>
-                                handleSearchTypeChange(event.target.value)
-                            }
+            <div className="container">
+                <div className="tabs mt-4 d-flex justify-content-between">
+                    <h1
+                        className={selectedTab === "search" ? "active" : ""}
+                        onClick={() => setSelectedTab("search")}
+                    >
+                        Recipe Search
+                    </h1>
+                    <h1
+                        className={selectedTab === "favourites" ? "active" : ""}
+                        onClick={() => setSelectedTab("favourites")}
+                    >
+                        Favourites
+                    </h1>
+                </div>
+                {selectedTab === "search" && (
+                    <>
+                        <form
+                            onSubmit={(event) => handleSearchSubmit(event)}
+                            className="my-3"
                         >
-                            <option value="name">Search by Name</option>
-                            <option value="ingredients">
-                                Search by Ingredients
-                            </option>
-                        </select>
+                            <div className="row">
+                                <div className="col-sm-8">
+                                    {searchType === "name" && (
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Enter a recipe name"
+                                            value={searchTerm}
+                                            onChange={(event) =>
+                                                setSearchTerm(
+                                                    event.target.value
+                                                )
+                                            }
+                                            className="form-control rounded"
+                                        />
+                                    )}
+                                    {searchType === "ingredients" && (
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Enter ingredients"
+                                            value={searchIngredient}
+                                            onChange={handleIngredientChange}
+                                            className="form-control rounded"
+                                        />
+                                    )}
+                                </div>
+                                <div className="col-sm-4">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-success btn-block"
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div className="row">
+                            <div className="col">
+                                <select
+                                    value={searchType}
+                                    onChange={(event) =>
+                                        handleSearchTypeChange(
+                                            event.target.value
+                                        )
+                                    }
+                                    className="form-control"
+                                >
+                                    <option value="name">Search by Name</option>
+                                    <option value="ingredients">
+                                        Search by Ingredients
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {!recipesDisplayed && (
+                            <div className="row mt-2">
+                                <HomeText />
+                            </div>
+                        )}
+
+                        {selectedTab === "search" && (
+                            <div className="d-flex flex-wrap justify-content-center mt-4">
+                                {recipes.map((recipe, index) => {
+                                    const isFavourite = favouriteRecipes.some(
+                                        (favRecipe) =>
+                                            recipe.id === favRecipe.id
+                                    );
+                                    const uniqueKey = `${recipe.id}-${index}`;
+                                    return (
+                                        <RecipeCard
+                                            key={uniqueKey}
+                                            recipe={recipe}
+                                            onClick={() =>
+                                                setSelectedRecipe(recipe)
+                                            }
+                                            onFavouriteButtonClick={
+                                                isFavourite
+                                                    ? removeFavouriteRecipe
+                                                    : addFavouriteRecipe
+                                            }
+                                            isFavourite={isFavourite}
+                                            searchType={searchType}
+                                            selectedTab={selectedTab}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        )}
+                        {recipesDisplayed && recipes.length > 0 && (
+                            <div className="d-flex justify-content-center">
+                                {" "}
+                                <button
+                                    className="view-more-button btn btn-primary my-4"
+                                    onClick={handleViewMoreClick}
+                                >
+                                    View More
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+                {selectedTab === "favourites" && (
+                    <div className="d-flex flex-wrap justify-content-center mt-4">
+                        {favouriteRecipes.length > 0 ? (
+                            favouriteRecipes.map((recipe) => (
+                                <RecipeCard
+                                    key={recipe.id}
+                                    recipe={recipe}
+                                    onClick={() => setSelectedRecipe(recipe)}
+                                    onFavouriteButtonClick={
+                                        removeFavouriteRecipe
+                                    }
+                                    isFavourite={true}
+                                    searchType={searchType}
+                                    selectedTab={selectedTab}
+                                />
+                            ))
+                        ) : (
+                            <p className="text-muted">No recipes here</p>
+                        )}
                     </div>
-                    {selectedTab === "search" && (
-                        <>
-                            {recipes.map((recipe, index) => {
-                                const isFavourite = favouriteRecipes.some(
-                                    (favRecipe) => recipe.id === favRecipe.id
-                                );
-                                const uniqueKey = `${recipe.id}-${index}`;
-                                return (
-                                    <RecipeCard
-                                        key={uniqueKey}
-                                        recipe={recipe}
-                                        onClick={() =>
-                                            setSelectedRecipe(recipe)
-                                        }
-                                        onFavouriteButtonClick={
-                                            isFavourite
-                                                ? removeFavouriteRecipe
-                                                : addFavouriteRecipe
-                                        }
-                                        isFavourite={isFavourite}
-                                        searchType={searchType}
-                                        selectedTab={selectedTab}
-                                    />
-                                );
-                            })}
-                        </>
-                    )}
-                    {recipesDisplayed && recipes.length > 0 && (
-                        <button
-                            className="view-more-button"
-                            onClick={handleViewMoreClick}
-                        >
-                            View More
-                        </button>
-                    )}
-                </>
-            )}
-            {selectedTab === "favourites" && (
-                <>
-                    {favouriteRecipes.length > 0 ? (
-                        favouriteRecipes.map((recipe) => (
-                            <RecipeCard
-                                key={recipe.id}
-                                recipe={recipe}
-                                onClick={() => setSelectedRecipe(recipe)}
-                                onFavouriteButtonClick={removeFavouriteRecipe}
-                                isFavourite={true}
-                                searchType={searchType}
-                                selectedTab={selectedTab}
-                            />
-                        ))
-                    ) : (
-                        <p>No recipes here</p>
-                    )}
-                </>
-            )}
-            {selectedRecipe && (
-                <RecipeModal
-                    recipeId={selectedRecipe.id.toString()}
-                    recipe={selectedRecipe}
-                    onClose={handleCloseModal}
-                />
-            )}
+                )}
+                {selectedRecipe && (
+                    <RecipeModal
+                        recipeId={selectedRecipe.id.toString()}
+                        recipe={selectedRecipe}
+                        onClose={handleCloseModal}
+                    />
+                )}
+            </div>
         </div>
     );
 };

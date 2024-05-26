@@ -1,0 +1,38 @@
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-title {
+    color: #ffc107;
+    font-weight: 700;
+}
+
+@media (max-width: 991.5px) {
+    .profile-title,
+    .profile-subtitle {
+        text-align: center;
+        width: 100%;
+    }
+}
+
+.text-danger {
+    color: #ff4d4f !important;
+}
+
+.btn-outline-primary {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-outline-primary:hover {
+    border-color: #ffc107;
+    background-color: #ffc107;
+}
+
+.email-display {
+    max-width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

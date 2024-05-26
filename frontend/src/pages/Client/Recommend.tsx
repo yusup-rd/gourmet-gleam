@@ -41,7 +41,7 @@ const Recommend = () => {
             }
         };
         restrict();
-        
+
         const fetchUserPreferences = async () => {
             try {
                 const response = await axios.get(
@@ -205,7 +205,7 @@ const Recommend = () => {
     return (
         <>
             <Navbar />
-            <div>
+            <div className="container">
                 {errorMessage ? (
                     <p>{errorMessage}</p>
                 ) : userPreferences ? (
@@ -341,14 +341,17 @@ const Recommend = () => {
                 {userPreferences && recipes.length > 0 && (
                     <div>
                         <h2>Recommended Recipes</h2>
-                        <ul>
+                        <div className="row">
                             {recipes.map((recipe, index) => {
                                 const isFavourite = favouriteRecipeIds.includes(
                                     recipe.id
                                 );
                                 const uniqueKey = `${recipe.id}-${index}`;
                                 return (
-                                    <li key={uniqueKey}>
+                                    <div
+                                        className="col-md-4 mb-4"
+                                        key={uniqueKey}
+                                    >
                                         <RecipeCard
                                             recipe={recipe}
                                             onClick={() =>
@@ -361,14 +364,20 @@ const Recommend = () => {
                                             searchType="name"
                                             selectedTab="search"
                                         />
-                                    </li>
+                                    </div>
                                 );
                             })}
-                        </ul>
+                        </div>
                         {moreRecipesAvailable ? (
-                            <button onClick={handleViewMoreClick}>
-                                View More
-                            </button>
+                            <div className="d-flex justify-content-center">
+                                {" "}
+                                <button
+                                    className="btn btn-primary mt-3"
+                                    onClick={handleViewMoreClick}
+                                >
+                                    View More
+                                </button>
+                            </div>
                         ) : (
                             <p>That's all recommendations available.</p>
                         )}

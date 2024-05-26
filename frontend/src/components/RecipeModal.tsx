@@ -23,6 +23,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [showSummary, setShowSummary] = useState<boolean>(true);
     const [showIngredients, setShowIngredients] = useState<boolean>(false);
+    const [activeButton, setActiveButton] = useState<string>("summary");
 
     useEffect(() => {
         const fetchRecipeData = async () => {
@@ -62,6 +63,10 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
         fetchRecipeData();
     }, [recipeId]);
 
+    const handleButtonClick = (button: string) => {
+        setActiveButton(button);
+    };
+
     if (!recipeSummary || !recipeWithSteps) {
         return null;
     }
@@ -80,7 +85,9 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                         <img src={recipe.image} alt="Recipe" />
                         <div className="button-group">
                             <button
+                                className={activeButton === "summary" ? "active" : ""}
                                 onClick={() => {
+                                    handleButtonClick("summary");
                                     setShowSummary(true);
                                     setShowIngredients(false);
                                 }}
@@ -88,7 +95,9 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                                 Summary
                             </button>
                             <button
+                                className={activeButton === "instructions" ? "active" : ""}
                                 onClick={() => {
+                                    handleButtonClick("instructions");
                                     setShowSummary(false);
                                     setShowIngredients(false);
                                 }}
@@ -96,7 +105,9 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                                 Instructions
                             </button>
                             <button
+                                className={activeButton === "ingredients" ? "active" : ""}
                                 onClick={() => {
+                                    handleButtonClick("ingredients");
                                     setShowSummary(false);
                                     setShowIngredients(true);
                                 }}
@@ -106,7 +117,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                         </div>
                         {showSummary ? (
                             <>
-                                <h3>Summary:</h3>
+                                <h3 className="mt-3">Summary:</h3>
                                 <p
                                     dangerouslySetInnerHTML={{
                                         __html: recipeSummary.summary,

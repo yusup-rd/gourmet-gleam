@@ -1,0 +1,15 @@
+.recipe-card {
+    cursor: pointer;
+}
+
+.recipe-card .recipe-image {
+    object-fit: cover;
+    height: 200px;
+}
+
+.recipe-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+

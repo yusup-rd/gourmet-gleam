@@ -1,0 +1,40 @@
+.home-image {
+    max-height: 300px;
+    max-width: 300px;
+    object-fit: cover;
+}
+.home-title {
+    color: #4caf50;
+    font-size: 32px;
+    font-weight: 700;
+}
+.home-subtitle {
+    color: #ffc107;
+    font-weight: 600;
+    font-size: 24px;
+    margin-top: 15px;
+}
+.home-description {
+    font-size: 18px;
+    color: #cccccc;
+}
+
+@media (max-width: 768px) {
+    .col-md-6 {
+        text-align: center;
+        order: initial !important;
+    }
+    .home-image {
+        margin: 0 auto;
+    }
+    .home-title {
+        text-align: center;
+    }
+    .home-subtitle {
+        text-align: center;
+    }
+    .home-description {
+        text-align: center;
+    }
+}
+

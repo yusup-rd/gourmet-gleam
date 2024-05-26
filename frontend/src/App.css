@@ -39,7 +39,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 .recipe-modal {
-    background-color: white;
+    background-color: #121212;
     padding: 20px;
     border-radius: 8px;
     width: 500px;
@@ -65,17 +65,36 @@ body::-webkit-scrollbar-thumb:hover {
     width: 100%;
     height: auto;
     margin-bottom: 20px;
+    border-radius: 5px;
 }
 
 .button-group button {
     margin-right: 10px;
     padding: 8px 12px;
     cursor: pointer;
+    border-radius: 5px;
 }
 
 .close-btn {
     cursor: pointer;
-    font-size: 24px;
+    font-size: 32px;
+}
+
+.recipe-modal::-webkit-scrollbar {
+    width: 10px;
+}
+
+.recipe-modal::-webkit-scrollbar-track {
+    background: #121212;
+}
+
+.recipe-modal::-webkit-scrollbar-thumb {
+    background: #3d3d3d;
+    border-radius: 5px;
+}
+
+.recipe-modal::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .tabs {
