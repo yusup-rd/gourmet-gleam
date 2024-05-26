@@ -365,8 +365,8 @@ const Profile = () => {
         }),
         menu: (provided: any) => ({
             ...provided,
-            backgroundColor: "#1a1a1a", // Dark background color
-            color: "#fff", // White text color
+            backgroundColor: "#1a1a1a", 
+            color: "#fff", 
         }),
         menuList: (provided: any) => ({
             ...provided,

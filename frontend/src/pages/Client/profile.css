@@ -1,15 +1,8 @@
-.container {
-    display: flex;
-    align-items: stretch !important;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-
 .card {
     border-radius: 0.5rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     flex: 1 !important;
+    align-self: flex-start;
 }
 
 .profile-title {
@@ -27,6 +20,9 @@
     .profile-subtitle {
         text-align: center;
         width: 100%;
+    }
+    .card{
+        align-self: center;
     }
 }
 
