@@ -320,7 +320,7 @@ const Home = () => {
                         )}
 
                         {selectedTab === "search" && (
-                            <div className="d-flex flex-wrap justify-content-center mt-4">
+                            <div className="d-flex flex-wrap align-items-stretch justify-content-center mt-4">
                                 {recipes.map((recipe, index) => {
                                     const isFavourite = favouriteRecipes.some(
                                         (favRecipe) =>
@@ -328,21 +328,24 @@ const Home = () => {
                                     );
                                     const uniqueKey = `${recipe.id}-${index}`;
                                     return (
-                                        <RecipeCard
-                                            key={uniqueKey}
-                                            recipe={recipe}
-                                            onClick={() =>
-                                                setSelectedRecipe(recipe)
-                                            }
-                                            onFavouriteButtonClick={
-                                                isFavourite
-                                                    ? removeFavouriteRecipe
-                                                    : addFavouriteRecipe
-                                            }
-                                            isFavourite={isFavourite}
-                                            searchType={searchType}
-                                            selectedTab={selectedTab}
-                                        />
+                                        <div className="row m-0">
+
+                                            <RecipeCard
+                                                key={uniqueKey}
+                                                recipe={recipe}
+                                                onClick={() =>
+                                                    setSelectedRecipe(recipe)
+                                                }
+                                                onFavouriteButtonClick={
+                                                    isFavourite
+                                                        ? removeFavouriteRecipe
+                                                        : addFavouriteRecipe
+                                                }
+                                                isFavourite={isFavourite}
+                                                searchType={searchType}
+                                                selectedTab={selectedTab}
+                                            />
+                                        </div>
                                     );
                                 })}
                             </div>
@@ -364,17 +367,19 @@ const Home = () => {
                     <div className="d-flex flex-wrap justify-content-center mt-4">
                         {favouriteRecipes.length > 0 ? (
                             favouriteRecipes.map((recipe) => (
-                                <RecipeCard
-                                    key={recipe.id}
-                                    recipe={recipe}
-                                    onClick={() => setSelectedRecipe(recipe)}
-                                    onFavouriteButtonClick={
-                                        removeFavouriteRecipe
-                                    }
-                                    isFavourite={true}
-                                    searchType={searchType}
-                                    selectedTab={selectedTab}
-                                />
+                                <div className="row m-0">
+                                    <RecipeCard
+                                        key={recipe.id}
+                                        recipe={recipe}
+                                        onClick={() => setSelectedRecipe(recipe)}
+                                        onFavouriteButtonClick={
+                                            removeFavouriteRecipe
+                                        }
+                                        isFavourite={true}
+                                        searchType={searchType}
+                                        selectedTab={selectedTab}
+                                    />
+                                </div>
                             ))
                         ) : (
                             <p className="text-muted">No recipes here</p>

@@ -150,6 +150,9 @@ const Login = () => {
                     </button>
                 </div>
             </div>
+            <div>
+                <p className="text-center mt-2 text-muted">OR<br/>Support: admin@gmail.com</p>
+            </div>
 
             {showEmailInput && (
                 <div

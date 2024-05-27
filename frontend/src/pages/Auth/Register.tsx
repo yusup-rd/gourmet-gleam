@@ -145,6 +145,9 @@ const Register = () => {
                     <Link to="/login">Already have an account</Link>
                 </div>
             </div>
+            <div>
+                <p className="text-center mt-2 text-muted">OR<br/>Support: admin@gmail.com</p>
+            </div>
         </StyledContainer>
     );
 };

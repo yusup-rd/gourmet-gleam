@@ -8,6 +8,8 @@ import RecipeModal from "../../components/RecipeModal";
 import * as api from "../../api";
 import { getUserId, getUserRole } from "../Auth/authApi";
 import { useNavigate } from "react-router-dom";
+import "./recommend.css";
+
 
 interface UserPreferences {
     preferredCuisine: string[];
@@ -206,11 +208,14 @@ const Recommend = () => {
         <>
             <Navbar />
             <div className="container">
+                <div className="background-image-1"></div>
+                <div className="background-image-2"></div>
+                <div className="background-image-3"></div>
                 {errorMessage ? (
-                    <p>{errorMessage}</p>
+                    <p className="text-danger">{errorMessage}</p>
                 ) : userPreferences ? (
                     <div>
-                        <h2>User Preferences</h2>
+                        <h2 className="title mt-5">User Preferences</h2>
                         {userPreferences.preferredCuisine.length > 0 ||
                         userPreferences.excludedCuisine.length > 0 ||
                         userPreferences.diet.length > 0 ||
@@ -221,7 +226,7 @@ const Recommend = () => {
                                 {userPreferences.preferredCuisine.length >
                                     0 && (
                                     <>
-                                        Preferred Cuisine:{" "}
+                                        <strong>Preferred Cuisine:</strong>{" "}
                                         {userPreferences.preferredCuisine.map(
                                             (cuisine, index) => (
                                                 <span key={index}>
@@ -247,7 +252,7 @@ const Recommend = () => {
                                 )}
                                 {userPreferences.excludedCuisine.length > 0 && (
                                     <>
-                                        Excluded Cuisine:{" "}
+                                        <strong>Excluded Cuisine:</strong>{" "}
                                         {userPreferences.excludedCuisine.map(
                                             (cuisine, index) => (
                                                 <span key={index}>
@@ -273,7 +278,7 @@ const Recommend = () => {
                                 )}
                                 {userPreferences.diet.length > 0 && (
                                     <>
-                                        Diet:{" "}
+                                        <strong>Diet:</strong>{" "}
                                         {userPreferences.diet.map(
                                             (diet, index) => (
                                                 <span key={index}>
@@ -298,7 +303,7 @@ const Recommend = () => {
                                 )}
                                 {userPreferences.intolerances.length > 0 && (
                                     <>
-                                        Intolerances:{" "}
+                                        <strong>Intolerances:</strong>{" "}
                                         {userPreferences.intolerances.map(
                                             (intolerance, index) => (
                                                 <span key={index}>
@@ -323,7 +328,7 @@ const Recommend = () => {
                                 )}
                             </p>
                         ) : (
-                            <p>
+                            <p className="text-muted">
                                 You haven't set any preferences in your account
                                 yet. Please take a moment to personalize your
                                 preferences to enhance your experience.
@@ -340,8 +345,8 @@ const Recommend = () => {
 
                 {userPreferences && recipes.length > 0 && (
                     <div>
-                        <h2>Recommended Recipes</h2>
-                        <div className="row">
+                        <h2 className="title mt-5">Recommended Recipes</h2>
+                        <div className="d-flex flex-wrap justify-content-center align-items-stretch">
                             {recipes.map((recipe, index) => {
                                 const isFavourite = favouriteRecipeIds.includes(
                                     recipe.id
@@ -349,7 +354,7 @@ const Recommend = () => {
                                 const uniqueKey = `${recipe.id}-${index}`;
                                 return (
                                     <div
-                                        className="col-md-4 mb-4"
+                                        className="row m-0"
                                         key={uniqueKey}
                                     >
                                         <RecipeCard
@@ -372,7 +377,7 @@ const Recommend = () => {
                             <div className="d-flex justify-content-center">
                                 {" "}
                                 <button
-                                    className="btn btn-primary mt-3"
+                                    className="btn btn-primary my-3"
                                     onClick={handleViewMoreClick}
                                 >
                                     View More

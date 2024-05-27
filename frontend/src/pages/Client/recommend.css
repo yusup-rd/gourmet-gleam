@@ -1,0 +1,40 @@
+body {
+    position: relative;
+}
+
+.background-image-1,
+.background-image-2,
+.background-image-3 {
+    position: fixed;
+    z-index: -1;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.background-image-1 {
+    top: 0;
+    right: 0;
+    width: 300px; /* Adjust size as needed */
+    height: 300px; /* Adjust size as needed */
+    background-image: url('../../assets/bg/croissant.svg');
+    opacity: 50%;
+}
+
+.background-image-2 {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 300px; /* Adjust size as needed */
+    height: 300px; /* Adjust size as needed */
+    background-image: url('../../assets/bg/cupcake.svg');
+    opacity: 50%;
+}
+
+.background-image-3 {
+    bottom: 0;
+    right: 0;
+    width: 300px; /* Adjust size as needed */
+    height: 300px; /* Adjust size as needed */
+    background-image: url('../../assets/bg/pretzel.svg');
+    opacity: 50%;
+}

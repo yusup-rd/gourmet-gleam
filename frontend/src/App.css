@@ -97,6 +97,12 @@ body::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
 
+.active-modal {
+    background-color: #333333 !important;
+    color: orange !important;
+    border: none;
+}
+
 .tabs {
     display: flex;
     gap: 2em;
@@ -127,4 +133,5 @@ body::-webkit-scrollbar-thumb:hover {
 .active {
     background-color: transparent !important;
     color: orange !important;
+    border: none;
 }

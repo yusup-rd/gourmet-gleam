@@ -76,16 +76,16 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
             <div className="recipe-modal">
                 <div className="recipe-modal-content">
                     <div className="recipe-modal-header">
-                        <h2>{recipeSummary.title}</h2>
+                        <h2 className="title pt-3">{recipeSummary.title}</h2>
                         <span className="close-btn" onClick={onClose}>
                             &times;
                         </span>
                     </div>
                     <div className="recipe-modal-body">
                         <img src={recipe.image} alt="Recipe" />
-                        <div className="button-group">
+                        <div className="button-group d-flex justify-content-around mb-3">
                             <button
-                                className={activeButton === "summary" ? "active" : ""}
+                                className={activeButton === "summary" ? "active-modal" : ""}
                                 onClick={() => {
                                     handleButtonClick("summary");
                                     setShowSummary(true);
@@ -95,7 +95,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                                 Summary
                             </button>
                             <button
-                                className={activeButton === "instructions" ? "active" : ""}
+                                className={activeButton === "instructions" ? "active-modal" : ""}
                                 onClick={() => {
                                     handleButtonClick("instructions");
                                     setShowSummary(false);
@@ -105,7 +105,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                                 Instructions
                             </button>
                             <button
-                                className={activeButton === "ingredients" ? "active" : ""}
+                                className={activeButton === "ingredients" ? "active-modal" : ""}
                                 onClick={() => {
                                     handleButtonClick("ingredients");
                                     setShowSummary(false);
@@ -117,7 +117,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                         </div>
                         {showSummary ? (
                             <>
-                                <h3 className="mt-3">Summary:</h3>
+                                <h3 className="title mt-4">Summary:</h3>
                                 <p
                                     dangerouslySetInnerHTML={{
                                         __html: recipeSummary.summary,
@@ -126,7 +126,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                             </>
                         ) : showIngredients ? (
                             <>
-                                <h3>Ingredients:</h3>
+                                <h3 className="title mt-4">Ingredients:</h3>
                                 <ul>
                                     {ingredients.map((ingredient, index) => (
                                         <li key={index}>
@@ -139,7 +139,7 @@ const RecipeModal = ({ recipeId, recipe, onClose }: Props) => {
                             </>
                         ) : (
                             <>
-                                <h3>Instructions:</h3>
+                                <h3 className="title mt-4">Instructions:</h3>
                                 <ol>
                                     {recipeWithSteps.steps.map(
                                         (step, index) => (
