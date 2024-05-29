@@ -81,4 +81,3 @@ const HomeText = () => {
 };
 
 export default HomeText;
-

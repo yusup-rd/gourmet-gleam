@@ -22,6 +22,9 @@ const Home = () => {
     );
     const [selectedTab, setSelectedTab] = useState<Tabs>("search");
     const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
+    const [filteredFavouriteRecipes, setFilteredFavouriteRecipes] = useState<
+        Recipe[]
+    >([]);
     const [recipesDisplayed, setRecipesDisplayed] = useState<boolean>(false);
     const pageNumber = useRef(1);
     const [searchClickedByName, setSearchClickedByName] =
@@ -46,6 +49,9 @@ const Home = () => {
                     const favouriteRecipesResponse =
                         await api.getFavouriteRecipes();
                     setFavouriteRecipes(favouriteRecipesResponse.results);
+                    setFilteredFavouriteRecipes(
+                        favouriteRecipesResponse.results
+                    );
                     if (
                         (searchClickedByName && searchType === "name") ||
                         (searchClickedByIngredients &&
@@ -188,6 +194,7 @@ const Home = () => {
             const userId = await getUserId();
             await api.addFavouriteRecipe(recipe, userId);
             setFavouriteRecipes([...favouriteRecipes, recipe]);
+            setFilteredFavouriteRecipes([...favouriteRecipes, recipe]);
         } catch (error) {
             console.error(error);
         }
@@ -201,6 +208,7 @@ const Home = () => {
                 (favRecipe) => recipe.id !== favRecipe.id
             );
             setFavouriteRecipes(updatedRecipes);
+            setFilteredFavouriteRecipes(updatedRecipes);
         } catch (error) {
             console.error(error);
         }
@@ -230,6 +238,17 @@ const Home = () => {
             clearDisplayedRecipes();
         }
         setSearchType(newSearchType);
+    };
+
+    const handleFavouriteSearchChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+        const filteredRecipes = favouriteRecipes.filter((recipe) =>
+            recipe.title.toLowerCase().includes(value.toLowerCase())
+        );
+        setFilteredFavouriteRecipes(filteredRecipes);
     };
 
     return (
@@ -329,7 +348,6 @@ const Home = () => {
                                     const uniqueKey = `${recipe.id}-${index}`;
                                     return (
                                         <div className="row m-0">
-
                                             <RecipeCard
                                                 key={uniqueKey}
                                                 recipe={recipe}
@@ -364,26 +382,39 @@ const Home = () => {
                     </>
                 )}
                 {selectedTab === "favourites" && (
-                    <div className="d-flex flex-wrap justify-content-center mt-4">
-                        {favouriteRecipes.length > 0 ? (
-                            favouriteRecipes.map((recipe) => (
-                                <div className="row m-0">
-                                    <RecipeCard
-                                        key={recipe.id}
-                                        recipe={recipe}
-                                        onClick={() => setSelectedRecipe(recipe)}
-                                        onFavouriteButtonClick={
-                                            removeFavouriteRecipe
-                                        }
-                                        isFavourite={true}
-                                        searchType={searchType}
-                                        selectedTab={selectedTab}
-                                    />
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-muted">No recipes here</p>
+                    <div className="mt-4">
+                        {favouriteRecipes.length > 0 && (
+                            <input
+                                type="text"
+                                placeholder="Search favourites"
+                                value={searchTerm}
+                                onChange={handleFavouriteSearchChange}
+                                className="form-control mb-3"
+                            />
                         )}
+                        <div className="d-flex flex-wrap justify-content-center">
+                            {filteredFavouriteRecipes.length > 0 ? (
+                                filteredFavouriteRecipes.map((recipe) => (
+                                    <div className="row m-0">
+                                        <RecipeCard
+                                            key={recipe.id}
+                                            recipe={recipe}
+                                            onClick={() =>
+                                                setSelectedRecipe(recipe)
+                                            }
+                                            onFavouriteButtonClick={
+                                                removeFavouriteRecipe
+                                            }
+                                            isFavourite={true}
+                                            searchType={searchType}
+                                            selectedTab={selectedTab}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-muted">No recipes here</p>
+                            )}
+                        </div>
                     </div>
                 )}
                 {selectedRecipe && (

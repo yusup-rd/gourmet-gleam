@@ -273,12 +273,10 @@ const Admin = () => {
                             )}
                         </div>
                         {!editableUserId && (
-                            <div
-                                className="d-flex flex-column"
-                            >
+                            <div className="d-flex flex-column">
                                 <button
                                     className="btn btn-primary text-left d-flex align-items-center justify-content-between rounded my-1"
-                                    style={{ width: "200px", height:"45px" }}
+                                    style={{ width: "200px", height: "45px" }}
                                     onClick={() => handleEdit(user.id)}
                                 >
                                     <span>Edit</span>
@@ -286,7 +284,7 @@ const Admin = () => {
                                 </button>
                                 <button
                                     className="btn btn-danger text-left d-flex align-items-center justify-content-between rounded my-1"
-                                    style={{ width: "200px", height:"45px" }}
+                                    style={{ width: "200px", height: "45px" }}
                                     onClick={() =>
                                         handleDelete(user.id, user.name)
                                     }
