@@ -648,7 +648,7 @@ const Profile = () => {
                                             </button>
                                         </div>
                                         {passwordError && (
-                                            <p className="text-danger mt-2">
+                                            <p className="text-danger mt-2 text-center">
                                                 {passwordError}
                                             </p>
                                         )}

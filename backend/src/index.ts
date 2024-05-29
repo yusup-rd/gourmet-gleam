@@ -113,7 +113,6 @@ app.get("/user-id", verifyUser, (req, res) => {
     res.json({ userId: userId });
 });
 
-
 // Password Reset via Email and OTP
 const OTP_EXPIRATION_TIME = 600;
 
@@ -124,7 +123,7 @@ app.post("/password-reset", async (req, res) => {
         // Fetch user's name based on the provided email
         const user = await prismaClient.user.findUnique({
             where: { email: email },
-            select: { name: true }
+            select: { name: true },
         });
 
         if (!user) {
@@ -458,11 +457,18 @@ app.put("/admin/users/:userId", async (req, res) => {
 app.delete("/admin/users/:userId", async (req, res) => {
     const userId = parseInt(req.params.userId);
     try {
-        await prismaClient.user.delete({
-            where: { id: userId },
-        });
+        await prismaClient.$transaction([
+            prismaClient.favouriteRecipes.deleteMany({
+                where: { userId: userId },
+            }),
+            prismaClient.user.delete({
+                where: { id: userId },
+            }),
+        ]);
 
-        return res.json({ message: "User deleted successfully" });
+        return res.json({
+            message: "User and their favorite recipes deleted successfully",
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Failed to delete user" });
@@ -568,10 +574,19 @@ app.post("/profile/change-password", verifyUser, async (req, res) => {
 app.delete("/profile/delete", verifyUser, async (req, res) => {
     const userId = req.body.userId;
     try {
-        await prismaClient.user.delete({
-            where: { id: userId },
-        });
+        await prismaClient.$transaction([
+            prismaClient.favouriteRecipes.deleteMany({
+                where: { userId: userId },
+            }),
+            prismaClient.user.delete({
+                where: { id: userId },
+            }),
+        ]);
         res.clearCookie("token");
+        return res.json({
+            message:
+                "User account and their favorite recipes deleted successfully",
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: "Failed to delete user account" });
